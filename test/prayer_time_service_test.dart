@@ -158,7 +158,7 @@ void main() {
     },
   );
 
-  test('warm cache preloads current and next month for Kurdistan cities', () async {
+  test('warm cache preloads six months for Kurdistan cities', () async {
     final requestedUrls = <String>[];
     final service = PrayerTimeService(
       client: MockClient((request) async {
@@ -176,7 +176,11 @@ void main() {
     );
 
     final firstPassCount = requestedUrls.length;
-    expect(firstPassCount, greaterThan(10));
+    expect(
+      firstPassCount,
+      service.supportedBangCities.length *
+          PrayerTimeService.warmCacheMonthWindow,
+    );
     expect(
       requestedUrls.any(
         (url) => url.contains(
@@ -197,6 +201,14 @@ void main() {
       requestedUrls.any(
         (url) => url.contains(
           'https://www.amozhgary.tv/bang/%D8%AF%D9%87%DB%86%DA%A9?month=03',
+        ),
+      ),
+      isTrue,
+    );
+    expect(
+      requestedUrls.any(
+        (url) => url.contains(
+          'https://www.amozhgary.tv/bang/%D9%87%DB%95%D9%88%D9%84%DB%8E%D8%B1?month=08',
         ),
       ),
       isTrue,

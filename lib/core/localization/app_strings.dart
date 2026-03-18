@@ -6,8 +6,6 @@ enum AppLanguage { english, arabic, kurdish }
 class AppStrings {
   const AppStrings(this.language);
 
-  static const int _offlineMonthWindow = 2;
-
   final AppLanguage language;
 
   bool get isRtl => language != AppLanguage.english;
@@ -849,94 +847,6 @@ class AppStrings {
       'يتم حفظ جداول بانغ الدقيقة محلياً لتعمل دون إنترنت بعد التحميل.',
     AppLanguage.kurdish =>
       'خشتەی وردی شارەکانی بانگ دوای داگرتن بۆ کاری ئوفلاین لۆکاڵی هەڵدەگیرێت.',
-  };
-
-  String get offlineSectionTitle => switch (language) {
-    AppLanguage.english => 'Offline access',
-    AppLanguage.arabic => 'الوصول دون إنترنت',
-    AppLanguage.kurdish => 'دەستگەیشتنی ئۆفلاین',
-  };
-
-  String get offlineSectionSubtitle => switch (language) {
-    AppLanguage.english =>
-      'Keep the main Quran flows available even when the network is gone.',
-    AppLanguage.arabic =>
-      'احتفظ بالمسارات الأساسية في التطبيق متاحة حتى عند انقطاع الإنترنت.',
-    AppLanguage.kurdish =>
-      'بەشە سەرەکییەکانی ئەپەکە بەردەست بهێڵە تەنانەت کاتێک ئینتەرنێت نییە.',
-  };
-
-  String get offlineQuranReadyLabel => switch (language) {
-    AppLanguage.english => 'Quran text and adhkar are already bundled offline.',
-    AppLanguage.arabic => 'نص القرآن والأذكار متوفران مسبقاً دون إنترنت.',
-    AppLanguage.kurdish =>
-      'دەقی قورئان و زیکرەکان پێشتر بۆ ئۆفلاین لەناو ئەپەکەدان.',
-  };
-
-  String get offlineHistoryReadyLabel => switch (language) {
-    AppLanguage.english =>
-      'Last read position and recent practice history stay on this device.',
-    AppLanguage.arabic =>
-      'آخر موضع قراءة وسجل التدريب الحديث يبقيان محفوظين على هذا الجهاز.',
-    AppLanguage.kurdish =>
-      'دوا شوێنی خوێندنەوە و مێژووی ڕاهێنانی نزیک لەسەر هەمان ئامێرەکە دەپارێزرێن.',
-  };
-
-  String offlineDownloadedAudioLabel(int count) => switch (language) {
-    AppLanguage.english =>
-      count > 0
-          ? 'Downloaded reciter audio is ready offline for $count surahs.'
-          : 'Downloaded reciter audio will be available offline after you save a surah.',
-    AppLanguage.arabic =>
-      count > 0
-          ? 'صوت القارئ المُنزّل جاهز دون إنترنت لعدد $count من السور.'
-          : 'سيصبح صوت القارئ متاحاً دون إنترنت بعد تنزيل سورة واحدة على الأقل.',
-    AppLanguage.kurdish =>
-      count > 0
-          ? 'دەنگی قاریی داگیراو بۆ $count سوورەت بۆ ئۆفلاین ئامادەیە.'
-          : 'دەنگی قاریی دوای دابەزاندنی لانیکەم یەک سوورەت بۆ ئۆفلاین ئامادە دەبێت.',
-  };
-
-  String offlinePrayerCacheLabel(
-    String cityName,
-    int cachedMonths,
-  ) => switch (language) {
-    AppLanguage.english =>
-      '$cityName prayer timetable cached for $cachedMonths of $_offlineMonthWindow months.',
-    AppLanguage.arabic =>
-      'تم حفظ جدول الصلاة لمدينة $cityName لعدد $cachedMonths من أصل $_offlineMonthWindow شهر.',
-    AppLanguage.kurdish =>
-      'خشتەی کاتەکانی بانگی $cityName بۆ $cachedMonths لە $_offlineMonthWindow مانگ هەڵگیراوە.',
-  };
-
-  String get offlinePrayerCacheHint => switch (language) {
-    AppLanguage.english =>
-      'Save the selected city now to keep exact prayer times available offline.',
-    AppLanguage.arabic =>
-      'احفظ المدينة المختارة الآن لتبقى أوقات الصلاة الدقيقة متاحة دون إنترنت.',
-    AppLanguage.kurdish =>
-      'شارە هەڵبژێردراوەکە ئێستا هەڵبگرە تاکو کاتە وردەکانی بانگ بۆ ئۆفلاین بەردەست بن.',
-  };
-
-  String get savePrayerTimesOfflineLabel => switch (language) {
-    AppLanguage.english => 'Save selected city offline',
-    AppLanguage.arabic => 'احفظ المدينة المختارة دون إنترنت',
-    AppLanguage.kurdish => 'شاری هەڵبژێردراو بۆ ئۆفلاین هەڵبگرە',
-  };
-
-  String get savingOfflineLabel => switch (language) {
-    AppLanguage.english => 'Saving offline data...',
-    AppLanguage.arabic => 'جارٍ حفظ بيانات الأوفلاين...',
-    AppLanguage.kurdish => 'داتای ئۆفلاین هەڵدەگیرێت...',
-  };
-
-  String get liveLocationOfflineHint => switch (language) {
-    AppLanguage.english =>
-      'Choose a saved city if you want exact city timetables available offline.',
-    AppLanguage.arabic =>
-      'اختر مدينة محفوظة إذا أردت بقاء الجداول الدقيقة متاحة دون إنترنت.',
-    AppLanguage.kurdish =>
-      'ئەگەر دەتەوێت خشتە وردەکانی شار بۆ ئۆفلاین بەردەست بن، شارێکی هەڵگیراو هەڵبژێرە.',
   };
 
   String get languageSectionTitle => switch (language) {

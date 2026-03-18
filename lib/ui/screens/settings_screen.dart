@@ -166,82 +166,6 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _SectionCard(
-            title: strings.offlineSectionTitle,
-            subtitle: strings.offlineSectionSubtitle,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _OfflineInfoRow(
-                  icon: Icons.menu_book_rounded,
-                  label: strings.offlineQuranReadyLabel,
-                ),
-                const SizedBox(height: 10),
-                _OfflineInfoRow(
-                  icon: Icons.history_rounded,
-                  label: strings.offlineHistoryReadyLabel,
-                ),
-                const SizedBox(height: 10),
-                _OfflineInfoRow(
-                  icon: Icons.download_done_rounded,
-                  label: strings.offlineDownloadedAudioLabel(
-                    settings.downloadedSurahCount(settings.selectedReciterId),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _OfflineInfoRow(
-                  icon: Icons.schedule_rounded,
-                  label:
-                      prayerController.useDeviceLocation ||
-                          prayerController.selectedBangCity == null
-                      ? strings.liveLocationOfflineHint
-                      : strings.offlinePrayerCacheLabel(
-                          strings.localizedCityName(
-                            prayerController.selectedBangCity!,
-                          ),
-                          prayerController.offlineCachedMonthCount,
-                        ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  prayerController.useDeviceLocation
-                      ? strings.liveLocationOfflineHint
-                      : strings.offlinePrayerCacheHint,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.4,
-                  ),
-                ),
-                if (prayerController.offlineCacheError != null) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    prayerController.offlineCacheError!,
-                    style: TextStyle(color: colorScheme.error),
-                  ),
-                ],
-                if (!prayerController.useDeviceLocation &&
-                    prayerController.selectedBangCity != null) ...[
-                  const SizedBox(height: 14),
-                  FilledButton.tonalIcon(
-                    onPressed: prayerController.isPreparingOfflineCache
-                        ? null
-                        : prayerController.prepareSelectedCityOffline,
-                    icon: Icon(
-                      prayerController.isPreparingOfflineCache
-                          ? Icons.sync_rounded
-                          : Icons.download_for_offline_rounded,
-                    ),
-                    label: Text(
-                      prayerController.isPreparingOfflineCache
-                          ? strings.savingOfflineLabel
-                          : strings.savePrayerTimesOfflineLabel,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SectionCard(
             title: strings.prayerSettingsTitle,
             subtitle: strings.prayerSettingsSubtitle,
             child: Column(
@@ -369,33 +293,6 @@ class _SectionCard extends StatelessWidget {
           child,
         ],
       ),
-    );
-  }
-}
-
-class _OfflineInfoRow extends StatelessWidget {
-  const _OfflineInfoRow({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: colorScheme.primary),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -17,8 +17,8 @@ class PrayerTimeService {
 
   static const _scheduleCachePrefix = 'bang_month_schedule';
   static const _warmMarkerPrefix = 'bang_month_warm';
+  static const int warmCacheMonthWindow = 6;
   static const int offlineMonthWindow = 2;
-
   final http.Client _client;
   final Future<SharedPreferences> Function() _preferencesProvider;
   final Map<String, Map<String, dynamic>> _monthScheduleCache = {};
@@ -109,10 +109,7 @@ class PrayerTimeService {
     required DateTime referenceDate,
   }) async {
     final prefs = await _preferencesProvider();
-    final months = <DateTime>{
-      DateTime(referenceDate.year, referenceDate.month),
-      DateTime(referenceDate.year, referenceDate.month + 1),
-    };
+    final months = _warmMonthDates(referenceDate).toList(growable: false);
 
     for (final monthDate in months) {
       final markerKey = _warmMarkerKey(monthDate);
@@ -496,6 +493,12 @@ class PrayerTimeService {
 
   String _schedulePrefsKey(String monthKey) =>
       '$_scheduleCachePrefix:$monthKey';
+
+  Iterable<DateTime> _warmMonthDates(DateTime referenceDate) sync* {
+    for (var offset = 0; offset < warmCacheMonthWindow; offset++) {
+      yield DateTime(referenceDate.year, referenceDate.month + offset);
+    }
+  }
 
   Iterable<DateTime> _offlineMonthDates(DateTime referenceDate) sync* {
     for (var offset = 0; offset < offlineMonthWindow; offset++) {
