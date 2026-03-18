@@ -37,6 +37,9 @@ class PrayerTimesController extends ChangeNotifier {
   bool useDeviceLocation = false;
   String? selectedCitySlug;
   bool isLoading = false;
+  bool isPreparingOfflineCache = false;
+  int offlineCachedMonthCount = 0;
+  String? offlineCacheError;
 
   DateTime _now = DateTime.now();
   Timer? _ticker;
@@ -85,6 +88,7 @@ class PrayerTimesController extends ChangeNotifier {
         selectedCitySlug != prefs.getString(_selectedCitySlugKey)) {
       await prefs.setString(_selectedCitySlugKey, selectedCitySlug!);
     }
+    await _refreshOfflineCacheStatus(notify: false);
     notifyListeners();
   }
 
@@ -126,6 +130,7 @@ class PrayerTimesController extends ChangeNotifier {
       _now = now;
 
       _startTicker();
+      await _refreshOfflineCacheStatus(notify: false);
 
       if (notificationsEnabled &&
           _todaySchedule != null &&
@@ -165,6 +170,7 @@ class PrayerTimesController extends ChangeNotifier {
     selectedCitySlug = slug;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_selectedCitySlugKey, slug);
+    await _refreshOfflineCacheStatus(notify: false);
     notifyListeners();
     await refreshPrayerTimes();
   }
@@ -180,6 +186,7 @@ class PrayerTimesController extends ChangeNotifier {
       selectedCitySlug = defaultBangCity!.slug;
       await prefs.setString(_selectedCitySlugKey, selectedCitySlug!);
     }
+    await _refreshOfflineCacheStatus(notify: false);
     notifyListeners();
     await refreshPrayerTimes();
   }
@@ -215,6 +222,35 @@ class PrayerTimesController extends ChangeNotifier {
       _locationService.openLocationSettings();
 
   Future<void> openAppSettings() => _locationService.openAppSettings();
+
+  Future<void> prepareSelectedCityOffline() async {
+    final city = selectedBangCity;
+    if (useDeviceLocation || city == null || isPreparingOfflineCache) {
+      return;
+    }
+
+    isPreparingOfflineCache = true;
+    offlineCacheError = null;
+    notifyListeners();
+
+    try {
+      offlineCachedMonthCount = await _prayerTimeService
+          .cacheBangCityForOffline(
+            slug: city.slug,
+            referenceDate: DateTime.now(),
+          );
+      if (offlineCachedMonthCount <= 0) {
+        offlineCacheError =
+            'Could not save prayer times offline right now. Try again while online.';
+      }
+    } catch (_) {
+      offlineCacheError =
+          'Could not save prayer times offline right now. Try again while online.';
+    } finally {
+      isPreparingOfflineCache = false;
+      notifyListeners();
+    }
+  }
 
   Future<DeviceLocation?> _resolveLocation() async {
     if (useDeviceLocation) {
@@ -268,6 +304,30 @@ class PrayerTimesController extends ChangeNotifier {
       }
       notifyListeners();
     });
+  }
+
+  Future<void> _refreshOfflineCacheStatus({required bool notify}) async {
+    final city = selectedBangCity;
+    if (useDeviceLocation || city == null) {
+      offlineCachedMonthCount = 0;
+      offlineCacheError = null;
+      if (notify) {
+        notifyListeners();
+      }
+      return;
+    }
+
+    offlineCachedMonthCount = await _prayerTimeService
+        .countCachedBangCityMonths(
+          slug: city.slug,
+          referenceDate: DateTime.now(),
+        );
+    if (offlineCachedMonthCount > 0) {
+      offlineCacheError = null;
+    }
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   @override

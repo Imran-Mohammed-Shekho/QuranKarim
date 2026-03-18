@@ -17,6 +17,7 @@ class PrayerTimeService {
 
   static const _scheduleCachePrefix = 'bang_month_schedule';
   static const _warmMarkerPrefix = 'bang_month_warm';
+  static const int offlineMonthWindow = 2;
 
   final http.Client _client;
   final Future<SharedPreferences> Function() _preferencesProvider;
@@ -139,6 +140,48 @@ class PrayerTimeService {
     }
   }
 
+  Future<int> cacheBangCityForOffline({
+    required String slug,
+    required DateTime referenceDate,
+  }) async {
+    final prefs = await _preferencesProvider();
+    var cachedMonths = 0;
+    for (final monthDate in _offlineMonthDates(referenceDate)) {
+      final schedule = await _ensureMonthScheduleCached(
+        slug: slug,
+        year: monthDate.year,
+        month: monthDate.month,
+        prefs: prefs,
+        allowNetwork: true,
+      );
+      if (schedule != null) {
+        cachedMonths++;
+      }
+    }
+    return cachedMonths;
+  }
+
+  Future<int> countCachedBangCityMonths({
+    required String slug,
+    required DateTime referenceDate,
+  }) async {
+    final prefs = await _preferencesProvider();
+    var cachedMonths = 0;
+    for (final monthDate in _offlineMonthDates(referenceDate)) {
+      final schedule = await _ensureMonthScheduleCached(
+        slug: slug,
+        year: monthDate.year,
+        month: monthDate.month,
+        prefs: prefs,
+        allowNetwork: false,
+      );
+      if (schedule != null) {
+        cachedMonths++;
+      }
+    }
+    return cachedMonths;
+  }
+
   Future<PrayerDaySchedule?> _fetchBangScheduleForDate({
     required DeviceLocation location,
     required DateTime date,
@@ -175,6 +218,14 @@ class PrayerTimeService {
             date,
             daySchedule['fajr'] as String?,
             PrayerName.fajr,
+          ),
+        ),
+        PrayerTimeEntry(
+          name: PrayerName.sunrise,
+          time: _timeForPrayer(
+            date,
+            daySchedule['sunrise'] as String?,
+            PrayerName.sunrise,
           ),
         ),
         PrayerTimeEntry(
@@ -327,6 +378,10 @@ class PrayerTimeService {
       date: DateTime(date.year, date.month, date.day),
       prayers: [
         PrayerTimeEntry(name: PrayerName.fajr, time: times.fajr.toLocal()),
+        PrayerTimeEntry(
+          name: PrayerName.sunrise,
+          time: times.sunrise.toLocal(),
+        ),
         PrayerTimeEntry(name: PrayerName.dhuhr, time: times.dhuhr.toLocal()),
         PrayerTimeEntry(name: PrayerName.asr, time: times.asr.toLocal()),
         PrayerTimeEntry(
@@ -397,6 +452,7 @@ class PrayerTimeService {
 
     switch (prayer) {
       case PrayerName.fajr:
+      case PrayerName.sunrise:
         break;
       case PrayerName.dhuhr:
         if (hour < 11) {
@@ -421,12 +477,15 @@ class PrayerTimeService {
     required DateTime now,
   }) {
     for (final prayer in today.prayers) {
+      if (!prayer.name.isFardPrayer) {
+        continue;
+      }
       if (prayer.time.isAfter(now)) {
         return prayer;
       }
     }
 
-    return tomorrow.prayers.first;
+    return tomorrow.prayers.firstWhere((prayer) => prayer.name.isFardPrayer);
   }
 
   String _monthKey({
@@ -437,6 +496,12 @@ class PrayerTimeService {
 
   String _schedulePrefsKey(String monthKey) =>
       '$_scheduleCachePrefix:$monthKey';
+
+  Iterable<DateTime> _offlineMonthDates(DateTime referenceDate) sync* {
+    for (var offset = 0; offset < offlineMonthWindow; offset++) {
+      yield DateTime(referenceDate.year, referenceDate.month + offset);
+    }
+  }
 
   String _warmMarkerKey(DateTime date) =>
       '$_warmMarkerPrefix:${date.year}:${date.month.toString().padLeft(2, '0')}';

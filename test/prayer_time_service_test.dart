@@ -35,15 +35,49 @@ void main() {
 
     expect(bangCitySchedule.prayers[0].time.hour, 4);
     expect(bangCitySchedule.prayers[0].time.minute, 59);
-    expect(bangCitySchedule.prayers[1].time.hour, 12);
-    expect(bangCitySchedule.prayers[1].time.minute, 23);
-    expect(bangCitySchedule.prayers[2].time.hour, 15);
-    expect(bangCitySchedule.prayers[2].time.minute, 36);
-    expect(bangCitySchedule.prayers[3].time.hour, 18);
-    expect(bangCitySchedule.prayers[3].time.minute, 10);
-    expect(bangCitySchedule.prayers[4].time.hour, 19);
-    expect(bangCitySchedule.prayers[4].time.minute, 25);
+    expect(bangCitySchedule.prayers[1].name, PrayerName.sunrise);
+    expect(bangCitySchedule.prayers[1].time.hour, 6);
+    expect(bangCitySchedule.prayers[1].time.minute, 28);
+    expect(bangCitySchedule.prayers[2].time.hour, 12);
+    expect(bangCitySchedule.prayers[2].time.minute, 23);
+    expect(bangCitySchedule.prayers[3].time.hour, 15);
+    expect(bangCitySchedule.prayers[3].time.minute, 36);
+    expect(bangCitySchedule.prayers[4].time.hour, 18);
+    expect(bangCitySchedule.prayers[4].time.minute, 10);
+    expect(bangCitySchedule.prayers[5].time.hour, 19);
+    expect(bangCitySchedule.prayers[5].time.minute, 25);
   });
+
+  test(
+    'sunrise appears in the schedule but is not treated as next salah',
+    () async {
+      final service = PrayerTimeService(
+        client: MockClient((request) async {
+          return http.Response.bytes(
+            utf8.encode(_sampleBangHtml),
+            200,
+            headers: {'content-type': 'text/html; charset=utf-8'},
+          );
+        }),
+      );
+
+      final model = await service.buildPrayerTimesModel(
+        location: const DeviceLocation(
+          latitude: 36.1911,
+          longitude: 44.0092,
+          city: 'Erbil',
+        ),
+        now: DateTime(2026, 3, 10, 5, 30),
+        madhab: PrayerMadhab.shafi,
+      );
+
+      expect(
+        model.prayers.any((entry) => entry.name == PrayerName.sunrise),
+        isTrue,
+      );
+      expect(model.nextPrayer.name, PrayerName.dhuhr);
+    },
+  );
 
   test('Bang timetable stays exact offline after it is cached', () async {
     final onlineService = PrayerTimeService(
@@ -87,6 +121,42 @@ void main() {
       equals(onlineSchedule.prayers.map((entry) => entry.time).toList()),
     );
   });
+
+  test(
+    'selected Bang city months can be saved explicitly for offline use',
+    () async {
+      final service = PrayerTimeService(
+        client: MockClient((request) async {
+          return http.Response.bytes(
+            utf8.encode(_sampleBangHtml),
+            200,
+            headers: {'content-type': 'text/html; charset=utf-8'},
+          );
+        }),
+      );
+
+      final cachedMonths = await service.cacheBangCityForOffline(
+        slug: 'هەولێر',
+        referenceDate: DateTime(2026, 3, 10),
+      );
+
+      expect(cachedMonths, PrayerTimeService.offlineMonthWindow);
+
+      final offlineService = PrayerTimeService(
+        client: MockClient((request) async {
+          throw Exception('offline');
+        }),
+      );
+
+      final offlineCachedMonths = await offlineService
+          .countCachedBangCityMonths(
+            slug: 'هەولێر',
+            referenceDate: DateTime(2026, 3, 10),
+          );
+
+      expect(offlineCachedMonths, PrayerTimeService.offlineMonthWindow);
+    },
+  );
 
   test('warm cache preloads current and next month for Kurdistan cities', () async {
     final requestedUrls = <String>[];

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum PrayerName { fajr, dhuhr, asr, maghrib, isha }
+enum PrayerName { fajr, sunrise, dhuhr, asr, maghrib, isha }
 
 enum PrayerMadhab { shafi, hanafi }
 
@@ -101,10 +101,18 @@ class PrayerTimesModel {
 }
 
 extension PrayerNameX on PrayerName {
+  bool get isFardPrayer => this != PrayerName.sunrise;
+
+  static List<PrayerName> get fardPrayers => PrayerName.values
+      .where((prayer) => prayer.isFardPrayer)
+      .toList(growable: false);
+
   String get label {
     switch (this) {
       case PrayerName.fajr:
         return 'Fajr';
+      case PrayerName.sunrise:
+        return 'Sunrise';
       case PrayerName.dhuhr:
         return 'Dhuhr';
       case PrayerName.asr:
@@ -120,6 +128,8 @@ extension PrayerNameX on PrayerName {
     switch (this) {
       case PrayerName.fajr:
         return Icons.wb_twilight_rounded;
+      case PrayerName.sunrise:
+        return Icons.wb_sunny_outlined;
       case PrayerName.dhuhr:
         return Icons.light_mode_rounded;
       case PrayerName.asr:

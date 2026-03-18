@@ -124,7 +124,7 @@ class NotificationService {
 
   Future<void> cancelPrayerNotifications() async {
     await initialize();
-    for (int i = 0; i < PrayerName.values.length; i++) {
+    for (int i = 0; i < PrayerNameX.fardPrayers.length; i++) {
       await _plugin.cancel(id: _notificationBaseId + i);
     }
   }
@@ -152,8 +152,8 @@ class NotificationService {
           : AndroidScheduleMode.inexactAllowWhileIdle;
     }
 
-    for (int index = 0; index < PrayerName.values.length; index++) {
-      final prayerName = PrayerName.values[index];
+    for (int index = 0; index < PrayerNameX.fardPrayers.length; index++) {
+      final prayerName = PrayerNameX.fardPrayers[index];
       final todayEntry = today.prayers.firstWhere(
         (item) => item.name == prayerName,
       );

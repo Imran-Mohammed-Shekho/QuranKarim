@@ -968,7 +968,7 @@ class _ReminderEditorSheetState extends State<_ReminderEditorSheet> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: PrayerName.values
+                children: PrayerNameX.fardPrayers
                     .map((prayer) {
                       return FilterChip(
                         label: Text(strings.prayerLabel(prayer)),

@@ -48,6 +48,18 @@ class _FakeApiService extends QuranApiService {
   }
 }
 
+class _ThrowingApiService extends QuranApiService {
+  @override
+  Future<List<Ayah>> fetchAyahsForSurah(int surahNumber) async {
+    throw Exception('offline');
+  }
+
+  @override
+  Future<Ayah> fetchAyah(int surahNumber, int ayahNumber) async {
+    throw Exception('offline');
+  }
+}
+
 class _FakeTranslationCacheService extends QuranTranslationCacheService {
   _FakeTranslationCacheService({Map<int, String>? cachedTranslations})
     : _cachedTranslations = cachedTranslations ?? {};
@@ -167,6 +179,36 @@ void main() {
         ayahs.first.audioUrl,
         'https://audio.example.com/banna/001001.mp3',
       );
+    },
+  );
+
+  test(
+    'repository returns bundled ayahs and cached translation while offline',
+    () async {
+      final repository = QuranRepository(
+        assetService: _FakeAssetService(
+          ayahs: const [
+            Ayah(
+              surahNumber: 1,
+              ayahNumber: 1,
+              arabicText: 'بِسْمِ اللَّهِ',
+              kurdishText: null,
+              audioUrl: 'assets/ayahs/audio/banna/001001.mp3',
+            ),
+          ],
+        ),
+        apiService: _ThrowingApiService(),
+        translationCacheService: _FakeTranslationCacheService(
+          cachedTranslations: {1: 'بە ناوی خوای'},
+        ),
+      );
+
+      final ayahs = await repository.getAyahsForSurah(1);
+
+      expect(ayahs, hasLength(1));
+      expect(ayahs.first.arabicText, 'بِسْمِ اللَّهِ');
+      expect(ayahs.first.kurdishText, 'بە ناوی خوای');
+      expect(ayahs.first.audioUrl, 'assets/ayahs/audio/banna/001001.mp3');
     },
   );
 }
