@@ -16,21 +16,30 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin;
 
-  static const String _channelId = 'prayer_times_channel';
+  // Android notification channel sound settings are immutable after creation.
+  static const String _channelId = 'prayer_times_channel_v2';
   static const String _channelName = 'Prayer Times';
   static const String _channelDescription =
       'Notifications for daily prayer times';
-  static const String _zikirChannelId = 'zikir_reminders_channel';
+  static const String _zikirChannelId = 'zikir_reminders_channel_v2';
   static const String _zikirChannelName = 'Zikir Reminders';
   static const String _zikirChannelDescription =
       'Daily reminders for tasbih and remembrance';
-  static const String pushChannelId = 'push_notifications_channel';
+  static const String pushChannelId = 'push_notifications_channel_v2';
   static const String _pushChannelName = 'Push Notifications';
   static const String _pushChannelDescription =
       'General push notifications from Firebase Cloud Messaging';
   static const int _notificationBaseId = 1200;
   static const String _scheduledZikirIdsKey =
       'scheduled_zikir_notification_ids';
+  static const DarwinNotificationDetails _darwinNotificationDetails =
+      DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentBanner: true,
+        presentList: true,
+        presentSound: true,
+      );
 
   bool _initialized = false;
 
@@ -167,8 +176,10 @@ class NotificationService {
             channelDescription: _channelDescription,
             importance: Importance.max,
             priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: _darwinNotificationDetails,
         ),
         androidScheduleMode: scheduleMode,
       );
@@ -205,8 +216,10 @@ class NotificationService {
           channelDescription: _pushChannelDescription,
           importance: Importance.max,
           priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
         ),
-        iOS: const DarwinNotificationDetails(),
+        iOS: _darwinNotificationDetails,
       ),
       payload: payload,
     );
@@ -254,8 +267,10 @@ class NotificationService {
             channelDescription: _zikirChannelDescription,
             importance: Importance.high,
             priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: _darwinNotificationDetails,
         ),
         androidScheduleMode: scheduleMode,
       );
@@ -302,6 +317,8 @@ class NotificationService {
         _channelName,
         description: _channelDescription,
         importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
       ),
     );
     await android.createNotificationChannel(
@@ -310,6 +327,8 @@ class NotificationService {
         _zikirChannelName,
         description: _zikirChannelDescription,
         importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
       ),
     );
     await android.createNotificationChannel(
@@ -318,6 +337,8 @@ class NotificationService {
         _pushChannelName,
         description: _pushChannelDescription,
         importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
       ),
     );
   }
