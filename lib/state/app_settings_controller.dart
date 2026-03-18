@@ -10,6 +10,7 @@ class AppSettingsController extends ChangeNotifier {
   static const _languageKey = 'app_language';
   static const _themeModeKey = 'app_theme_mode';
   static const _selectedReciterKey = 'selected_reciter';
+  static const _onboardingCompletedKey = 'onboarding_completed';
 
   AppSettingsController({
     required ReciterDownloadService reciterDownloadService,
@@ -27,6 +28,8 @@ class AppSettingsController extends ChangeNotifier {
   int? _downloadingSurahNumber;
   ReciterDownloadProgress? _reciterDownloadProgress;
   String? _reciterDownloadError;
+  bool _hasCompletedOnboarding = false;
+  bool _isBootstrapped = false;
 
   AppStrings get strings => AppStrings(language);
 
@@ -41,12 +44,15 @@ class AppSettingsController extends ChangeNotifier {
   ReciterDownloadProgress? get reciterDownloadProgress =>
       _reciterDownloadProgress;
   String? get reciterDownloadError => _reciterDownloadError;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
+  bool get isBootstrapped => _isBootstrapped;
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
     final savedLanguage = prefs.getString(_languageKey);
     final savedThemeMode = prefs.getString(_themeModeKey);
     final savedReciter = prefs.getString(_selectedReciterKey)?.trim();
+    _hasCompletedOnboarding = prefs.getBool(_onboardingCompletedKey) ?? false;
     if (savedLanguage != null) {
       language = AppLanguage.values.firstWhere(
         (value) => value.name == savedLanguage,
@@ -77,6 +83,7 @@ class AppSettingsController extends ChangeNotifier {
       _selectedReciterId = 'banna';
     }
 
+    _isBootstrapped = true;
     notifyListeners();
   }
 
@@ -97,6 +104,17 @@ class AppSettingsController extends ChangeNotifier {
     themeMode = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_themeModeKey, value.name);
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding() async {
+    if (_hasCompletedOnboarding) {
+      return;
+    }
+
+    _hasCompletedOnboarding = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingCompletedKey, true);
     notifyListeners();
   }
 

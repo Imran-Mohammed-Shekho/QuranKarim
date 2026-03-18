@@ -797,6 +797,129 @@ class AppStrings {
     AppLanguage.kurdish => 'بۆ ئەمڕۆ دیاریکراوە',
   };
 
+  String get onboardingTitle => switch (language) {
+    AppLanguage.english => 'Set up your Quran companion',
+    AppLanguage.arabic => 'أكمِل إعداد رفيقك القرآني',
+    AppLanguage.kurdish => 'ئامادەکردنی بەرنامە بۆ دواتر',
+  };
+
+  String get onboardingSubtitle => switch (language) {
+    AppLanguage.english =>
+      'A quick first-run setup for language, prayer location, and prayer reminders.',
+    AppLanguage.arabic =>
+      'إعداد سريع لأول تشغيل لاختيار اللغة وموقع الصلاة وتذكيرات الصلاة.',
+    AppLanguage.kurdish =>
+      'ڕێکخستنێکی خێرا بۆ یەکەم جار بۆ زمان، شوێنی بانگ و ئاگادارکردنەوەی نوێژ.',
+  };
+
+  String get onboardingLanguageTitle => switch (language) {
+    AppLanguage.english => 'Choose your language',
+    AppLanguage.arabic => 'اختر لغتك',
+    AppLanguage.kurdish => 'زمانەکەت هەڵبژێرە',
+  };
+
+  String get onboardingLanguageSubtitle => switch (language) {
+    AppLanguage.english =>
+      'Pick the interface language you want to use across the app.',
+    AppLanguage.arabic => 'اختر لغة الواجهة التي تريد استخدامها في التطبيق.',
+    AppLanguage.kurdish =>
+      'ئەو زمانەی ڕووکار هەڵبژێرە کە دەتەوێت لە هەموو ئەپەکەدا بەکاریبهێنیت.',
+  };
+
+  String get onboardingLocationTitle => switch (language) {
+    AppLanguage.english => 'Set your prayer location',
+    AppLanguage.arabic => 'حدّد موقع الصلاة',
+    AppLanguage.kurdish => 'شوێنی بانگ دیاری بکە',
+  };
+
+  String get onboardingLocationSubtitle => switch (language) {
+    AppLanguage.english =>
+      'Use your live location or choose a saved city for the prayer timetable.',
+    AppLanguage.arabic =>
+      'استخدم موقعك المباشر أو اختر مدينة محفوظة لجدول أوقات الصلاة.',
+    AppLanguage.kurdish =>
+      'یان شوێنی ڕاستەوخۆ بەکاربهێنە یان شارێکی هەڵگیراو بۆ خشتەی کاتەکانی بانگ هەڵبژێرە.',
+  };
+
+  String get onboardingLiveLocationCardTitle => switch (language) {
+    AppLanguage.english => 'Use live location',
+    AppLanguage.arabic => 'استخدم الموقع المباشر',
+    AppLanguage.kurdish => 'شوێنی ڕاستەوخۆ بەکاربهێنە',
+  };
+
+  String get onboardingLiveLocationCardBody => switch (language) {
+    AppLanguage.english =>
+      'Best when you move between places and want location-based prayer times and Qibla.',
+    AppLanguage.arabic =>
+      'الخيار الأفضل إذا كنت تتنقل وتريد أوقات صلاة واتجاه قبلة حسب موقعك.',
+    AppLanguage.kurdish =>
+      'باشترین هەڵبژاردەیە ئەگەر دەگوازیتەوە و دەتەوێت کاتەکانی بانگ و قیبلە بە شوێنەکەت بێت.',
+  };
+
+  String get onboardingCityCardTitle => switch (language) {
+    AppLanguage.english => 'Choose a prayer city',
+    AppLanguage.arabic => 'اختر مدينة للصلاة',
+    AppLanguage.kurdish => 'شاری بانگ هەڵبژێرە',
+  };
+
+  String get onboardingCityCardBody => switch (language) {
+    AppLanguage.english =>
+      'Use a fixed city if you want a stable timetable without asking for location every time.',
+    AppLanguage.arabic =>
+      'استخدم مدينة ثابتة إذا كنت تريد جدولاً مستقراً من دون طلب الموقع كل مرة.',
+    AppLanguage.kurdish =>
+      'شارێکی جێگیر هەڵبژێرە ئەگەر دەتەوێت خشتەیەکی جێگیرت هەبێت بێ داوای شوێن لە هەموو جارێک.',
+  };
+
+  String get onboardingNotificationsTitle => switch (language) {
+    AppLanguage.english => 'Prayer reminders',
+    AppLanguage.arabic => 'تذكيرات الصلاة',
+    AppLanguage.kurdish => 'ئاگادارکردنەوەی نوێژ',
+  };
+
+  String get onboardingNotificationsSubtitle => switch (language) {
+    AppLanguage.english =>
+      'Turn prayer notifications on now, or leave them off and enable them later.',
+    AppLanguage.arabic =>
+      'فعّل إشعارات الصلاة الآن أو اتركها مغلقة وفعّلها لاحقاً.',
+    AppLanguage.kurdish =>
+      'ئاگادارکردنەوەی نوێژ ئێستا چالاک بکە یان بێجێیبهێڵە و دواتر چالاکی بکە.',
+  };
+
+  String get onboardingNotificationsHint => switch (language) {
+    AppLanguage.english =>
+      'The app will ask for notification permission only if you turn this on.',
+    AppLanguage.arabic =>
+      'سيطلب التطبيق إذن الإشعارات فقط إذا فعّلت هذا الخيار.',
+    AppLanguage.kurdish =>
+      'ئەپەکە تەنها ئەگەر ئەمە چالاک بکەیت داوای مۆڵەتی ئاگادارکردنەوە دەکات.',
+  };
+
+  String get onboardingSettingsHint => switch (language) {
+    AppLanguage.english => 'You can change any of these later in Settings.',
+    AppLanguage.arabic => 'يمكنك تغيير كل هذه الخيارات لاحقاً من الإعدادات.',
+    AppLanguage.kurdish =>
+      'دەتوانیت دواتر هەموو ئەمانە لە ڕێکخستنەکاندا بگۆڕیت.',
+  };
+
+  String get onboardingBackLabel => switch (language) {
+    AppLanguage.english => 'Back',
+    AppLanguage.arabic => 'رجوع',
+    AppLanguage.kurdish => 'گەڕانەوە',
+  };
+
+  String get onboardingContinueLabel => switch (language) {
+    AppLanguage.english => 'Continue',
+    AppLanguage.arabic => 'متابعة',
+    AppLanguage.kurdish => 'بەردەوام بە',
+  };
+
+  String get onboardingFinishLabel => switch (language) {
+    AppLanguage.english => 'Finish setup',
+    AppLanguage.arabic => 'إنهاء الإعداد',
+    AppLanguage.kurdish => 'تەواوکردنی ڕێکخستن',
+  };
+
   String get settingsTitle => settings;
 
   String get settingsSubtitle => switch (language) {
@@ -1005,11 +1128,11 @@ class AppStrings {
 
   String get aboutSectionBody => switch (language) {
     AppLanguage.english =>
-      'Quran Trainer helps with recitation practice and displays exact Bang prayer times for supported Kurdistan cities with offline cache after download.',
+      'Quran Noor helps with recitation practice and displays exact Bang prayer times for supported Kurdistan cities with offline cache after download.',
     AppLanguage.arabic =>
-      'يساعدك مدرب القرآن على التدريب على التلاوة ويعرض أوقات بانغ الدقيقة للمدن المدعومة في كردستان مع حفظها للعمل دون إنترنت بعد التحميل.',
+      'يساعدك Quran Noor على التدريب على التلاوة ويعرض أوقات بانغ الدقيقة للمدن المدعومة في كردستان مع حفظها للعمل دون إنترنت بعد التحميل.',
     AppLanguage.kurdish =>
-      'ئەپی قورئان یارمەتیت دەدات لە فێربوون و خوێنندەوەی قورئانی پیرۆز. وە سەرجەم کاتەکانی بانگ بۆ هەموو شارەکانی کوردستان و جیهان دەخاتەبەردەست. ',
+      'Quran Noor یارمەتیت دەدات لە فێربوون و خوێندنەوەی قورئانی پیرۆز، و کاتەکانی بانگ بۆ شارە پشتیوانیکراوەکانی کوردستان لەبەردەست دەخات. ',
   };
 
   String get locationAccessRequired => switch (language) {

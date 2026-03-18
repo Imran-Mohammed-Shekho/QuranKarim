@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../state/app_settings_controller.dart';
 import 'app_shell_screen.dart';
+import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,6 +20,8 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _scaleAnimation;
   Timer? _navigationTimer;
+  bool _splashDelayCompleted = false;
+  bool _didNavigate = false;
 
   @override
   void initState() {
@@ -38,22 +41,32 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
     _navigationTimer = Timer(const Duration(milliseconds: 2400), () {
-      if (!mounted) {
-        return;
-      }
-
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder<void>(
-          transitionDuration: const Duration(milliseconds: 650),
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return FadeTransition(
-              opacity: animation,
-              child: const AppShellScreen(),
-            );
-          },
-        ),
-      );
+      _splashDelayCompleted = true;
+      _attemptNavigation(context.read<AppSettingsController>());
     });
+  }
+
+  void _attemptNavigation(AppSettingsController settings) {
+    if (!mounted ||
+        _didNavigate ||
+        !_splashDelayCompleted ||
+        !settings.isBootstrapped) {
+      return;
+    }
+
+    _didNavigate = true;
+    final nextScreen = settings.hasCompletedOnboarding
+        ? const AppShellScreen()
+        : const OnboardingScreen();
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        transitionDuration: const Duration(milliseconds: 650),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return FadeTransition(opacity: animation, child: nextScreen);
+        },
+      ),
+    );
   }
 
   @override
@@ -67,7 +80,12 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final strings = context.watch<AppSettingsController>().strings;
+    final settings = context.watch<AppSettingsController>();
+    final strings = settings.strings;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _attemptNavigation(settings);
+    });
 
     return Scaffold(
       body: DecoratedBox(
@@ -115,6 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                           Container(
                             width: 96,
                             height: 96,
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: colorScheme.surface.withValues(
                                 alpha: 0.78,
@@ -133,11 +152,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ],
                             ),
-                            child: Icon(
-                              Icons.auto_stories_rounded,
-                              size: 42,
-                              color: colorScheme.primary,
-                            ),
+                            child: Image.asset('assets/app_logo.png'),
                           ),
                           const SizedBox(height: 28),
                           Text(

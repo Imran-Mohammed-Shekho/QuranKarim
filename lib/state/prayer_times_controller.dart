@@ -184,6 +184,25 @@ class PrayerTimesController extends ChangeNotifier {
     await refreshPrayerTimes();
   }
 
+  Future<void> configurePrayerLocation({
+    required bool useLiveLocation,
+    String? citySlug,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    useDeviceLocation = useLiveLocation;
+    await prefs.setBool(_useDeviceLocationKey, useLiveLocation);
+
+    final resolvedCitySlug =
+        citySlug ?? selectedCitySlug ?? defaultBangCity?.slug;
+    if (resolvedCitySlug != null) {
+      selectedCitySlug = resolvedCitySlug;
+      await prefs.setString(_selectedCitySlugKey, resolvedCitySlug);
+    }
+
+    notifyListeners();
+    await refreshPrayerTimes();
+  }
+
   Future<void> setNotificationsEnabled(bool value) async {
     if (value) {
       final granted = await _notificationService.requestPermissions();

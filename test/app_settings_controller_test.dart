@@ -78,4 +78,30 @@ void main() {
     expect(controller.selectedReciterId, 'abdul_basit_mp3');
     expect(controller.isReciterSurahDownloaded('abdul_basit_mp3', 2), isTrue);
   });
+
+  test('completeOnboarding persists the first-run flag', () async {
+    SharedPreferences.setMockInitialValues({});
+    final controller = AppSettingsController(
+      reciterDownloadService: _FakeReciterDownloadService(
+        downloadedSurahsByReciter: <String, Set<int>>{},
+      ),
+    );
+
+    await controller.bootstrap();
+    expect(controller.isBootstrapped, isTrue);
+    expect(controller.hasCompletedOnboarding, isFalse);
+
+    await controller.completeOnboarding();
+
+    expect(controller.hasCompletedOnboarding, isTrue);
+
+    final reloaded = AppSettingsController(
+      reciterDownloadService: _FakeReciterDownloadService(
+        downloadedSurahsByReciter: <String, Set<int>>{},
+      ),
+    );
+    await reloaded.bootstrap();
+
+    expect(reloaded.hasCompletedOnboarding, isTrue);
+  });
 }
