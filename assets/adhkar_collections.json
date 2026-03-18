@@ -1,0 +1,387 @@
+{
+  "builtInDhikrs": [
+    {
+      "id": "subhanallah",
+      "arabicText": "سبحان الله",
+      "transliteration": "SubhanAllah",
+      "meaning": "Glory be to Allah",
+      "localizedMeaning": {
+        "english": "Glory be to Allah",
+        "arabic": "تنزيه لله عن كل نقص",
+        "kurdish": "پاکی و بێ کەموکوڕی بۆ خوای گەورە"
+      },
+      "defaultTarget": 33
+    },
+    {
+      "id": "alhamdulillah",
+      "arabicText": "الحمد لله",
+      "transliteration": "Alhamdulillah",
+      "meaning": "All praise is for Allah",
+      "localizedMeaning": {
+        "english": "All praise is for Allah",
+        "arabic": "كل الحمد والثناء لله",
+        "kurdish": "هەموو ستایش و سوپاس بۆ خوای گەورەیە"
+      },
+      "defaultTarget": 33
+    },
+    {
+      "id": "allahu_akbar",
+      "arabicText": "الله أكبر",
+      "transliteration": "Allahu Akbar",
+      "meaning": "Allah is the Greatest",
+      "localizedMeaning": {
+        "english": "Allah is the Greatest",
+        "arabic": "الله أعظم من كل شيء",
+        "kurdish": "خوا گەورەترە لە هەموو شتێک"
+      },
+      "defaultTarget": 34
+    },
+    {
+      "id": "astaghfirullah",
+      "arabicText": "أستغفر الله",
+      "transliteration": "Astaghfirullah",
+      "meaning": "I seek forgiveness from Allah",
+      "localizedMeaning": {
+        "english": "I seek forgiveness from Allah",
+        "arabic": "أطلب المغفرة من الله",
+        "kurdish": "داوای لێخۆشبوون لە خوای گەورە دەکەم"
+      },
+      "defaultTarget": 100
+    },
+    {
+      "id": "la_ilaha_illallah",
+      "arabicText": "لا إله إلا الله",
+      "transliteration": "La ilaha illallah",
+      "meaning": "There is no god but Allah",
+      "localizedMeaning": {
+        "english": "There is no god but Allah",
+        "arabic": "لا معبود بحق إلا الله",
+        "kurdish": "هیچ پەرستراوێکی بەحق نییە جگە لە خوا"
+      },
+      "defaultTarget": 100
+    },
+    {
+      "id": "morning_ayat_al_kursi",
+      "arabicText": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+      "transliteration": "Ayat al-Kursi",
+      "meaning": "Ayat al-Kursi",
+      "localizedMeaning": {
+        "english": "Recite Ayat al-Kursi once.",
+        "arabic": "قراءة آية الكرسي مرة واحدة.",
+        "kurdish": "ئایەتی کورسی یەکجار بخوێنەوە."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "ikhlas",
+      "arabicText": "قُلْ هُوَ اللَّهُ أَحَدٌ",
+      "transliteration": "Surat al-Ikhlas",
+      "meaning": "Surat al-Ikhlas",
+      "localizedMeaning": {
+        "english": "Recite Surat al-Ikhlas.",
+        "arabic": "قراءة سورة الإخلاص.",
+        "kurdish": "سوورەتی ئیخلاص بخوێنەوە."
+      },
+      "defaultTarget": 3
+    },
+    {
+      "id": "falaq",
+      "arabicText": "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
+      "transliteration": "Surat al-Falaq",
+      "meaning": "Surat al-Falaq",
+      "localizedMeaning": {
+        "english": "Recite Surat al-Falaq.",
+        "arabic": "قراءة سورة الفلق.",
+        "kurdish": "سوورەتی فەلەق بخوێنەوە."
+      },
+      "defaultTarget": 3
+    },
+    {
+      "id": "nas",
+      "arabicText": "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+      "transliteration": "Surat an-Nas",
+      "meaning": "Surat an-Nas",
+      "localizedMeaning": {
+        "english": "Recite Surat an-Nas.",
+        "arabic": "قراءة سورة الناس.",
+        "kurdish": "سوورەتی ناس بخوێنەوە."
+      },
+      "defaultTarget": 3
+    },
+    {
+      "id": "morning_hasbiyallah",
+      "arabicText": "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+      "transliteration": "Hasbiyallahu la ilaha illa Huwa...",
+      "meaning": "Allah is sufficient for me; there is no god but Him.",
+      "localizedMeaning": {
+        "english": "Allah is sufficient for me; there is no god but Him.",
+        "arabic": "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم.",
+        "kurdish": "خوا بۆ من بەسە، هیچ پەرستراوێکی بەحق نییە جگە لەو."
+      },
+      "defaultTarget": 7
+    },
+    {
+      "id": "morning_subhanallahi_wa_bihamdih",
+      "arabicText": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "transliteration": "SubhanAllahi wa bihamdihi",
+      "meaning": "Glory and praise be to Allah.",
+      "localizedMeaning": {
+        "english": "Glory and praise be to Allah.",
+        "arabic": "سبحان الله وبحمده.",
+        "kurdish": "پاکی و ستایش بۆ خوای گەورە."
+      },
+      "defaultTarget": 100
+    },
+    {
+      "id": "morning_la_ilaha_wahdah",
+      "arabicText": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "La ilaha illallahu wahdahu la sharika lah...",
+      "meaning": "There is no god but Allah alone, without partner.",
+      "localizedMeaning": {
+        "english": "There is no god but Allah alone, without partner.",
+        "arabic": "لا إله إلا الله وحده لا شريك له له الملك وله الحمد وهو على كل شيء قدير.",
+        "kurdish": "هیچ پەرستراوێکی بەحق نییە جگە لە خوای یەکتا و بێ هاوبەش."
+      },
+      "defaultTarget": 10
+    },
+    {
+      "id": "morning_asbahna",
+      "arabicText": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ",
+      "transliteration": "Asbahna wa asbah al-mulku lillah",
+      "meaning": "We enter the morning and all dominion belongs to Allah.",
+      "localizedMeaning": {
+        "english": "We enter the morning and all dominion belongs to Allah.",
+        "arabic": "أصبحنا وأصبح الملك لله.",
+        "kurdish": "بەیانی کرد و هەموو پاشایەتی بۆ خوای گەورەیە."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "morning_bika_asbahna",
+      "arabicText": "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+      "transliteration": "Allahumma bika asbahna wa bika amsayna...",
+      "meaning": "O Allah, by You we enter morning and evening.",
+      "localizedMeaning": {
+        "english": "O Allah, by You we enter morning and evening.",
+        "arabic": "اللهم بك أصبحنا وبك أمسينا وبك نحيا وبك نموت وإليك النشور.",
+        "kurdish": "خوایە، بە تۆ بەیانی و ئێوارە دەکەین، بە تۆ دەژین و دەمرین."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "evening_amsayna",
+      "arabicText": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",
+      "transliteration": "Amsayna wa amsa al-mulku lillah",
+      "meaning": "We enter the evening and all dominion belongs to Allah.",
+      "localizedMeaning": {
+        "english": "We enter the evening and all dominion belongs to Allah.",
+        "arabic": "أمسينا وأمسى الملك لله.",
+        "kurdish": "ئێوارە کرد و هەموو پاشایەتی بۆ خوای گەورەیە."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "evening_bika_amsayna",
+      "arabicText": "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
+      "transliteration": "Allahumma bika amsayna wa bika asbahna...",
+      "meaning": "O Allah, by You we enter the evening and the morning.",
+      "localizedMeaning": {
+        "english": "O Allah, by You we enter the evening and the morning.",
+        "arabic": "اللهم بك أمسينا وبك أصبحنا وبك نحيا وبك نموت وإليك المصير.",
+        "kurdish": "خوایە، بە تۆ ئێوارە و بەیانی دەکەین و بە تۆ دەژین و دەمرین."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "sleep_bismika",
+      "arabicText": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+      "transliteration": "Bismika Allahumma amutu wa ahya",
+      "meaning": "In Your name, O Allah, I die and I live.",
+      "localizedMeaning": {
+        "english": "In Your name, O Allah, I die and I live.",
+        "arabic": "باسمك اللهم أموت وأحيا.",
+        "kurdish": "بە ناوی تۆ، خوایە، دەمرم و دەژیم."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "sleep_subhanallah",
+      "arabicText": "سُبْحَانَ اللَّهِ",
+      "transliteration": "SubhanAllah",
+      "meaning": "Glory be to Allah before sleep.",
+      "localizedMeaning": {
+        "english": "Glory be to Allah before sleep.",
+        "arabic": "تسبيح قبل النوم.",
+        "kurdish": "تەسبیح پێش خەوتن."
+      },
+      "defaultTarget": 33
+    },
+    {
+      "id": "sleep_alhamdulillah",
+      "arabicText": "الْحَمْدُ لِلَّهِ",
+      "transliteration": "Alhamdulillah",
+      "meaning": "Praise be to Allah before sleep.",
+      "localizedMeaning": {
+        "english": "Praise be to Allah before sleep.",
+        "arabic": "تحميد قبل النوم.",
+        "kurdish": "سوپاس بۆ خوا پێش خەوتن."
+      },
+      "defaultTarget": 33
+    },
+    {
+      "id": "sleep_allahu_akbar",
+      "arabicText": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "meaning": "Allah is the Greatest before sleep.",
+      "localizedMeaning": {
+        "english": "Allah is the Greatest before sleep.",
+        "arabic": "تكبير قبل النوم.",
+        "kurdish": "تکبیر پێش خەوتن."
+      },
+      "defaultTarget": 34
+    },
+    {
+      "id": "istighfar_sayyid",
+      "arabicText": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ",
+      "transliteration": "Allahumma anta Rabbi la ilaha illa Ant...",
+      "meaning": "The master supplication for seeking forgiveness.",
+      "localizedMeaning": {
+        "english": "The master supplication for seeking forgiveness.",
+        "arabic": "سيد الاستغفار.",
+        "kurdish": "سەییدی ئیستیغفار."
+      },
+      "defaultTarget": 1
+    },
+    {
+      "id": "istighfar_general",
+      "arabicText": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+      "transliteration": "Astaghfirullaha wa atubu ilayh",
+      "meaning": "I seek Allah's forgiveness and repent to Him.",
+      "localizedMeaning": {
+        "english": "I seek Allah's forgiveness and repent to Him.",
+        "arabic": "أستغفر الله وأتوب إليه.",
+        "kurdish": "داوای لێخۆشبوون لە خوا دەکەم و تۆبە بۆی دەکەم."
+      },
+      "defaultTarget": 100
+    }
+  ],
+  "presetSets": [
+    {
+      "id": "after_salah",
+      "title": "After Salah Tasbih",
+      "localizedTitle": {
+        "english": "After Salah Tasbih",
+        "arabic": "تسبيح بعد الصلاة",
+        "kurdish": "تەسبیح دوای نوێژ"
+      },
+      "subtitle": "Move through the well-known post-prayer remembrance set.",
+      "localizedSubtitle": {
+        "english": "Move through the well-known post-prayer remembrance set.",
+        "arabic": "تنقّل في مجموعة الأذكار المعروفة التي تُقال بعد الصلاة.",
+        "kurdish": "بە نۆرە لە زیکرە ناسراوەکانی دوای نوێژ بڕۆ."
+      },
+      "steps": [
+        {"dhikrId": "subhanallah", "targetCount": 33},
+        {"dhikrId": "alhamdulillah", "targetCount": 33},
+        {"dhikrId": "allahu_akbar", "targetCount": 34}
+      ]
+    },
+    {
+      "id": "morning",
+      "title": "Morning Adhkar",
+      "localizedTitle": {
+        "english": "Morning Adhkar",
+        "arabic": "أذكار الصباح",
+        "kurdish": "زیکری بەیانی"
+      },
+      "subtitle": "Start the day with the commonly recited morning remembrance collection.",
+      "localizedSubtitle": {
+        "english": "Start the day with the commonly recited morning remembrance collection.",
+        "arabic": "ابدأ يومك بمجموعة أذكار الصباح المشهورة.",
+        "kurdish": "ڕۆژەکەت بە کۆمەڵە زیکری ناسراوی بەیانی دەست پێبکە."
+      },
+      "steps": [
+        {"dhikrId": "morning_ayat_al_kursi", "targetCount": 1},
+        {"dhikrId": "ikhlas", "targetCount": 3},
+        {"dhikrId": "falaq", "targetCount": 3},
+        {"dhikrId": "nas", "targetCount": 3},
+        {"dhikrId": "morning_asbahna", "targetCount": 1},
+        {"dhikrId": "morning_bika_asbahna", "targetCount": 1},
+        {"dhikrId": "morning_hasbiyallah", "targetCount": 7},
+        {"dhikrId": "morning_la_ilaha_wahdah", "targetCount": 10},
+        {"dhikrId": "morning_subhanallahi_wa_bihamdih", "targetCount": 100}
+      ]
+    },
+    {
+      "id": "evening",
+      "title": "Evening Adhkar",
+      "localizedTitle": {
+        "english": "Evening Adhkar",
+        "arabic": "أذكار المساء",
+        "kurdish": "زیکری ئێوارە"
+      },
+      "subtitle": "Close the day with the most common evening remembrance flow.",
+      "localizedSubtitle": {
+        "english": "Close the day with the most common evening remembrance flow.",
+        "arabic": "اختم يومك بأشهر مسار لأذكار المساء.",
+        "kurdish": "ڕۆژەکەت بە ناسراوترین زنجیرەی زیکری ئێوارە کۆتایی پێبهێنە."
+      },
+      "steps": [
+        {"dhikrId": "morning_ayat_al_kursi", "targetCount": 1},
+        {"dhikrId": "ikhlas", "targetCount": 3},
+        {"dhikrId": "falaq", "targetCount": 3},
+        {"dhikrId": "nas", "targetCount": 3},
+        {"dhikrId": "evening_amsayna", "targetCount": 1},
+        {"dhikrId": "evening_bika_amsayna", "targetCount": 1},
+        {"dhikrId": "morning_hasbiyallah", "targetCount": 7},
+        {"dhikrId": "morning_la_ilaha_wahdah", "targetCount": 10},
+        {"dhikrId": "morning_subhanallahi_wa_bihamdih", "targetCount": 100}
+      ]
+    },
+    {
+      "id": "sleep",
+      "title": "Sleep Adhkar",
+      "localizedTitle": {
+        "english": "Sleep Adhkar",
+        "arabic": "أذكار النوم",
+        "kurdish": "زیکری پێش خەوتن"
+      },
+      "subtitle": "Prepare for sleep with the well-known nightly adhkar.",
+      "localizedSubtitle": {
+        "english": "Prepare for sleep with the well-known nightly adhkar.",
+        "arabic": "استعد للنوم بالأذكار المشهورة التي تُقال ليلاً.",
+        "kurdish": "خۆت بۆ خەوتن ئامادە بکە بە زیکرە ناسراوەکانی شەو."
+      },
+      "steps": [
+        {"dhikrId": "morning_ayat_al_kursi", "targetCount": 1},
+        {"dhikrId": "ikhlas", "targetCount": 3},
+        {"dhikrId": "falaq", "targetCount": 3},
+        {"dhikrId": "nas", "targetCount": 3},
+        {"dhikrId": "sleep_bismika", "targetCount": 1},
+        {"dhikrId": "sleep_subhanallah", "targetCount": 33},
+        {"dhikrId": "sleep_alhamdulillah", "targetCount": 33},
+        {"dhikrId": "sleep_allahu_akbar", "targetCount": 34}
+      ]
+    },
+    {
+      "id": "istighfar",
+      "title": "Istighfar Collection",
+      "localizedTitle": {
+        "english": "Istighfar Collection",
+        "arabic": "مجموعة الاستغفار",
+        "kurdish": "کۆمەڵەی ئیستیغفار"
+      },
+      "subtitle": "A dedicated flow for repentance and seeking forgiveness.",
+      "localizedSubtitle": {
+        "english": "A dedicated flow for repentance and seeking forgiveness.",
+        "arabic": "مسار مخصص للتوبة وطلب المغفرة.",
+        "kurdish": "زنجیرەیەکی تایبەت بۆ تۆبە و داوای لێخۆشبوون."
+      },
+      "steps": [
+        {"dhikrId": "istighfar_sayyid", "targetCount": 1},
+        {"dhikrId": "astaghfirullah", "targetCount": 100},
+        {"dhikrId": "istighfar_general", "targetCount": 100}
+      ]
+    }
+  ]
+}
