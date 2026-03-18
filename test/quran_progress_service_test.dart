@@ -34,12 +34,18 @@ void main() {
       MemorizationCheckpoint(
         surahNumber: 18,
         revealedWords: 42,
+        totalWords: 80,
+        needsReview: true,
+        lastMistakeWordIndex: 41,
         updatedAt: DateTime(2026, 3, 16, 18, 30),
       ),
     );
 
     var snapshot = await service.loadSnapshot();
     expect(snapshot.memorizationCheckpoints[18]?.revealedWords, 42);
+    expect(snapshot.memorizationCheckpoints[18]?.totalWords, 80);
+    expect(snapshot.memorizationCheckpoints[18]?.needsReview, isTrue);
+    expect(snapshot.memorizationCheckpoints[18]?.lastMistakeWordIndex, 41);
 
     await service.clearMemorizationCheckpoint(18);
     snapshot = await service.loadSnapshot();

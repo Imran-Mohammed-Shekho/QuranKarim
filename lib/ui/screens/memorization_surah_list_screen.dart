@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/surah.dart';
+import '../../models/quran_progress_models.dart';
 import '../../state/app_settings_controller.dart';
 import '../../state/quran_practice_controller.dart';
 import 'memorization_session_screen.dart';
@@ -41,20 +42,52 @@ class _MemorizationSurahListScreenState
         bottom: false,
         child: Consumer<QuranPracticeController>(
           builder: (context, controller, _) {
-            final filteredSurahs = controller.surahs
-                .where((surah) {
-                  if (_query.trim().isEmpty) {
-                    return true;
-                  }
+            final filteredSurahs =
+                controller.surahs
+                    .where((surah) {
+                      if (_query.trim().isEmpty) {
+                        return true;
+                      }
 
-                  final normalizedQuery = _query.trim().toLowerCase();
-                  return surah.number.toString().contains(normalizedQuery) ||
-                      surah.nameEnglish
-                          .toLowerCase()
-                          .contains(normalizedQuery) ||
-                      surah.nameArabic.contains(_query.trim());
-                })
-                .toList(growable: false);
+                      final normalizedQuery = _query.trim().toLowerCase();
+                      return surah.number.toString().contains(
+                            normalizedQuery,
+                          ) ||
+                          surah.nameEnglish.toLowerCase().contains(
+                            normalizedQuery,
+                          ) ||
+                          surah.nameArabic.contains(_query.trim());
+                    })
+                    .toList(growable: true)
+                  ..sort((a, b) {
+                    final stageA = controller.memorizationStageForSurah(
+                      a.number,
+                    );
+                    final stageB = controller.memorizationStageForSurah(
+                      b.number,
+                    );
+                    final priority =
+                        _stagePriority(stageA) - _stagePriority(stageB);
+                    if (priority != 0) {
+                      return priority;
+                    }
+
+                    final checkpointA = controller.checkpointForSurah(a.number);
+                    final checkpointB = controller.checkpointForSurah(b.number);
+                    if (checkpointA != null && checkpointB != null) {
+                      return checkpointB.updatedAt.compareTo(
+                        checkpointA.updatedAt,
+                      );
+                    }
+                    return a.number.compareTo(b.number);
+                  });
+            final stageCounts = <MemorizationWorkflowStage, int>{
+              for (final stage in MemorizationWorkflowStage.values) stage: 0,
+            };
+            for (final surah in controller.surahs) {
+              final stage = controller.memorizationStageForSurah(surah.number);
+              stageCounts[stage] = (stageCounts[stage] ?? 0) + 1;
+            }
 
             if (controller.isLoadingSurahs && controller.surahs.isEmpty) {
               return const Center(child: CircularProgressIndicator());
@@ -83,6 +116,53 @@ class _MemorizationSurahListScreenState
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             height: 1.45,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: colorScheme.outlineVariant.withValues(
+                                alpha: 0.6,
+                              ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                strings.memorizationWorkflowTitle,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                strings.memorizationWorkflowBody,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: MemorizationWorkflowStage.values
+                                    .map(
+                                      (stage) => _StageCountChip(
+                                        label: strings.memorizationStageLabel(
+                                          stage,
+                                        ),
+                                        count: stageCounts[stage] ?? 0,
+                                      ),
+                                    )
+                                    .toList(growable: false),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -128,6 +208,12 @@ class _MemorizationSurahListScreenState
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           final surah = filteredSurahs[index];
+                          final checkpoint = controller.checkpointForSurah(
+                            surah.number,
+                          );
+                          final stage = controller.memorizationStageForSurah(
+                            surah.number,
+                          );
 
                           return Padding(
                             padding: EdgeInsets.only(
@@ -137,6 +223,14 @@ class _MemorizationSurahListScreenState
                             ),
                             child: _SurahCard(
                               surah: surah,
+                              stage: stage,
+                              summary: strings.memorizationStageSummary(
+                                stage,
+                                revealedWords: checkpoint?.revealedWords ?? 0,
+                                totalWords: checkpoint?.totalWords ?? 0,
+                                lastMistakeWordIndex:
+                                    checkpoint?.lastMistakeWordIndex,
+                              ),
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
@@ -161,15 +255,23 @@ class _MemorizationSurahListScreenState
 }
 
 class _SurahCard extends StatelessWidget {
-  const _SurahCard({required this.surah, required this.onTap});
+  const _SurahCard({
+    required this.surah,
+    required this.stage,
+    required this.summary,
+    required this.onTap,
+  });
 
   final Surah surah;
+  final MemorizationWorkflowStage stage;
+  final String summary;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final strings = context.read<AppSettingsController>().strings;
 
     return InkWell(
       borderRadius: BorderRadius.circular(28),
@@ -217,13 +319,19 @@ class _SurahCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  _StageBadge(label: strings.memorizationStageLabel(stage)),
                   const SizedBox(height: 6),
                   Text(
-                    context
-                        .read<AppSettingsController>()
-                        .strings
-                        .ayahCountInline(surah.ayahCount),
+                    summary,
                     style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    strings.ayahCountInline(surah.ayahCount),
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -247,6 +355,58 @@ class _SurahCard extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StageCountChip extends StatelessWidget {
+  const _StageCountChip({required this.label, required this.count});
+
+  final String label;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        '$label • $count',
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
+
+class _StageBadge extends StatelessWidget {
+  const _StageBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -292,6 +452,15 @@ class _EmptySearchState extends StatelessWidget {
       ),
     );
   }
+}
+
+int _stagePriority(MemorizationWorkflowStage stage) {
+  return switch (stage) {
+    MemorizationWorkflowStage.needsPractice => 0,
+    MemorizationWorkflowStage.continueLesson => 1,
+    MemorizationWorkflowStage.newLesson => 2,
+    MemorizationWorkflowStage.memorized => 3,
+  };
 }
 
 class _ErrorState extends StatelessWidget {

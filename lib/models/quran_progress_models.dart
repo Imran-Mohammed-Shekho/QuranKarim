@@ -1,5 +1,12 @@
 enum PracticeSessionType { recitation, memorization }
 
+enum MemorizationWorkflowStage {
+  newLesson,
+  continueLesson,
+  needsPractice,
+  memorized,
+}
+
 class LastReadProgress {
   const LastReadProgress({
     required this.surahNumber,
@@ -34,17 +41,41 @@ class MemorizationCheckpoint {
   const MemorizationCheckpoint({
     required this.surahNumber,
     required this.revealedWords,
+    this.totalWords = 0,
+    this.needsReview = false,
+    this.lastMistakeWordIndex,
     required this.updatedAt,
   });
 
   final int surahNumber;
   final int revealedWords;
+  final int totalWords;
+  final bool needsReview;
+  final int? lastMistakeWordIndex;
   final DateTime updatedAt;
+
+  bool get isCompleted => totalWords > 0 && revealedWords >= totalWords;
+
+  MemorizationWorkflowStage get stage {
+    if (isCompleted) {
+      return MemorizationWorkflowStage.memorized;
+    }
+    if (needsReview) {
+      return MemorizationWorkflowStage.needsPractice;
+    }
+    if (revealedWords > 0) {
+      return MemorizationWorkflowStage.continueLesson;
+    }
+    return MemorizationWorkflowStage.newLesson;
+  }
 
   Map<String, dynamic> toJson() {
     return {
       'surahNumber': surahNumber,
       'revealedWords': revealedWords,
+      'totalWords': totalWords,
+      'needsReview': needsReview,
+      'lastMistakeWordIndex': lastMistakeWordIndex,
       'updatedAt': updatedAt.toIso8601String(),
     };
   }
@@ -53,6 +84,9 @@ class MemorizationCheckpoint {
     return MemorizationCheckpoint(
       surahNumber: (json['surahNumber'] as num?)?.toInt() ?? 0,
       revealedWords: (json['revealedWords'] as num?)?.toInt() ?? 0,
+      totalWords: (json['totalWords'] as num?)?.toInt() ?? 0,
+      needsReview: json['needsReview'] as bool? ?? false,
+      lastMistakeWordIndex: (json['lastMistakeWordIndex'] as num?)?.toInt(),
       updatedAt:
           DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
           DateTime.fromMillisecondsSinceEpoch(0),

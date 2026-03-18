@@ -280,8 +280,10 @@ class SettingsScreen extends StatelessWidget {
                   })
                   .toList(growable: false),
               selected: {settings.language},
-              onSelectionChanged: (selection) {
-                settings.setLanguage(selection.first);
+              onSelectionChanged: (selection) async {
+                await settings.setLanguage(selection.first);
+                await prayerController
+                    .rescheduleNotificationsForCurrentLanguage();
               },
             ),
           ),

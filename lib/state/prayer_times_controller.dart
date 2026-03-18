@@ -218,6 +218,24 @@ class PrayerTimesController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> rescheduleNotificationsForCurrentLanguage() async {
+    if (!notificationsEnabled ||
+        _todaySchedule == null ||
+        _tomorrowSchedule == null) {
+      return;
+    }
+
+    final granted = await _notificationService.ensurePermissions();
+    if (!granted) {
+      return;
+    }
+
+    await _notificationService.schedulePrayerNotifications(
+      today: _todaySchedule!,
+      tomorrow: _tomorrowSchedule!,
+    );
+  }
+
   Future<void> openLocationSettings() =>
       _locationService.openLocationSettings();
 

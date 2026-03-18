@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/localization/app_strings.dart';
 import '../../data/models/memorization_word.dart';
 import '../../data/models/surah.dart';
+import '../../models/quran_progress_models.dart';
 import '../../state/app_settings_controller.dart';
 import '../../state/quran_practice_controller.dart';
 
@@ -39,6 +40,9 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
       body: Consumer<QuranPracticeController>(
         builder: (context, controller, _) {
           final checkpoint = controller.checkpointForSurah(widget.surah.number);
+          final stage = controller.memorizationStageForSurah(
+            widget.surah.number,
+          );
           if (controller.isMemorizationLoading &&
               controller.memorizationWords.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -73,6 +77,12 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
           final progress = totalWords == 0
               ? 0.0
               : (revealed / totalWords).clamp(0.0, 1.0);
+          final stageSummary = strings.memorizationStageSummary(
+            stage,
+            revealedWords: checkpoint?.revealedWords ?? revealed,
+            totalWords: checkpoint?.totalWords ?? totalWords,
+            lastMistakeWordIndex: checkpoint?.lastMistakeWordIndex,
+          );
 
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
@@ -104,6 +114,10 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      _WorkflowStagePill(
+                        label: strings.memorizationStageLabel(stage),
                       ),
                       const SizedBox(height: 18),
                       Row(
@@ -140,17 +154,36 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
                           backgroundColor: colorScheme.surfaceContainerHighest,
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      Text(
+                        stageSummary,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (checkpoint != null &&
-                    !controller.memorizationCompleted &&
-                    revealed > 0) ...[
+                if (stage == MemorizationWorkflowStage.newLesson) ...[
                   _FeedbackCard(
-                    title: 'Saved checkpoint',
-                    body:
-                        'Resume from word $revealed of $totalWords, or restart this surah from the beginning.',
+                    title: strings.memorizationWorkflowTitle,
+                    body: strings.memorizationWorkflowBody,
+                    tone: _FeedbackTone.success,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (stage == MemorizationWorkflowStage.continueLesson &&
+                    checkpoint != null) ...[
+                  _FeedbackCard(
+                    title: strings.memorizationSavedCheckpointTitle,
+                    body: strings.memorizationSavedCheckpointBody(
+                      checkpoint.revealedWords,
+                      checkpoint.totalWords > 0
+                          ? checkpoint.totalWords
+                          : totalWords,
+                    ),
                     tone: _FeedbackTone.success,
                   ),
                   const SizedBox(height: 12),
@@ -160,11 +193,61 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
                     children: [
                       FilledButton.tonal(
                         onPressed: controller.startMemorization,
-                        child: const Text('Resume checkpoint'),
+                        child: Text(strings.memorizationResumeLesson),
                       ),
                       OutlinedButton(
                         onPressed: controller.retryMemorization,
-                        child: const Text('Start from beginning'),
+                        child: Text(strings.memorizationStartFromBeginning),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (stage == MemorizationWorkflowStage.needsPractice &&
+                    checkpoint != null) ...[
+                  _FeedbackCard(
+                    title: strings.memorizationStageLabel(stage),
+                    body: stageSummary,
+                    tone: _FeedbackTone.error,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      FilledButton.tonal(
+                        onPressed: controller.practiceMemorizationWeakPoint,
+                        child: Text(strings.memorizationPracticeWeakPoint),
+                      ),
+                      OutlinedButton(
+                        onPressed: controller.retryMemorization,
+                        child: Text(strings.memorizationStartFromBeginning),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (stage == MemorizationWorkflowStage.memorized &&
+                    checkpoint != null &&
+                    !controller.memorizationCompleted &&
+                    !controller.isMemorizationListening) ...[
+                  _FeedbackCard(
+                    title: strings.memorizationCompletedTitle,
+                    body: strings.memorizationCompletedBody,
+                    tone: _FeedbackTone.success,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      FilledButton.tonal(
+                        onPressed: controller.reviewMemorizationFromBeginning,
+                        child: Text(strings.memorizationReviewFromBeginning),
+                      ),
+                      OutlinedButton(
+                        onPressed: controller.retryMemorization,
+                        child: Text(strings.memorizationStartFromBeginning),
                       ),
                     ],
                   ),
@@ -279,6 +362,32 @@ class _MemorizationSessionScreenState extends State<MemorizationSessionScreen> {
     }
     return '${strings.memorizationExpectedWordLabel}: $expectedWord\n'
         '${strings.memorizationSpokenWordLabel}: $spokenWord';
+  }
+}
+
+class _WorkflowStagePill extends StatelessWidget {
+  const _WorkflowStagePill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
   }
 }
 

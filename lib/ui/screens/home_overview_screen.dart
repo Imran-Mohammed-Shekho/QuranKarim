@@ -328,15 +328,24 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
                       if (latestCheckpointSurah != null &&
                           latestCheckpoint != null)
                         _ActionCard(
-                          title: strings.continueMemorizationLabel,
-                          body: strings.recentMemorizationSessionSummary(
-                            latestCheckpointSurah.nameEnglish,
-                            latestCheckpoint.revealedWords,
+                          title: strings.memorizationStageLabel(
+                            latestCheckpoint.stage,
+                          ),
+                          body: strings.memorizationStageSummary(
+                            latestCheckpoint.stage,
+                            revealedWords: latestCheckpoint.revealedWords,
+                            totalWords: latestCheckpoint.totalWords,
+                            lastMistakeWordIndex:
+                                latestCheckpoint.lastMistakeWordIndex,
                           ),
                           icon: Icons.auto_awesome_rounded,
                           onPressed: () =>
                               _openMemorizationSession(latestCheckpointSurah!),
-                          buttonLabel: strings.resumeLabel,
+                          buttonLabel:
+                              latestCheckpoint.stage ==
+                                  MemorizationWorkflowStage.needsPractice
+                              ? strings.memorizationPracticeWeakPoint
+                              : strings.resumeLabel,
                         ),
                       if ((lastReadSurah != null ||
                               latestCheckpointSurah != null) &&

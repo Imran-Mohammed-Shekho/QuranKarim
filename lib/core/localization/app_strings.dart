@@ -1,4 +1,5 @@
 import '../../models/prayer_time_model.dart';
+import '../../models/quran_progress_models.dart';
 
 enum AppLanguage { english, arabic, kurdish }
 
@@ -302,11 +303,98 @@ class AppStrings {
 
   String get memorizationModeSubtitle => switch (language) {
     AppLanguage.english =>
-      'Practice reciting from memory. The words appear only as you recite them correctly.',
+      'Follow a clear flow: start a new lesson, continue saved progress, fix weak points, and finish each surah with confidence.',
     AppLanguage.arabic =>
-      'تدرّب على التلاوة من الحفظ. تظهر الكلمات تدريجياً عند النطق الصحيح.',
+      'اتبع مساراً واضحاً: ابدأ درساً جديداً، وواصل التقدم المحفوظ، وراجع المواضع الضعيفة، ثم أتم السورة بثقة.',
     AppLanguage.kurdish =>
-      'لەبەرکردنی سورەتەکان و ڕاهێنان کردن، وشەکان بەهێواش دەردەکەون.',
+      'بە ڕێگایەکی ڕوون کار بکە: دەرسێکی نوێ دەست پێ بکە، لە شوێنی پاشەکەوتکراو بەردەوام بە، خاڵە لاوازەکان چاک بکەوە، و سورەتەکە تەواو بکە.',
+  };
+
+  String get memorizationWorkflowTitle => switch (language) {
+    AppLanguage.english => 'How memorization works',
+    AppLanguage.arabic => 'كيف يعمل مسار الحفظ',
+    AppLanguage.kurdish => ' ڕێبەری لەبەرکردن  چۆن کار دەکات',
+  };
+
+  String get memorizationWorkflowBody => switch (language) {
+    AppLanguage.english =>
+      'Start reciting from memory. Correct words unlock the mushaf, mistakes are saved for review, and finished surahs stay marked as memorized.',
+    AppLanguage.arabic =>
+      'ابدأ التلاوة من الحفظ. الكلمات الصحيحة تكشف النص، والأخطاء تُحفظ للمراجعة، والسور المكتملة تبقى معلَّمة كمحفوظة.',
+    AppLanguage.kurdish =>
+      'لەبەرەوە دەست بە خوێندنەوە بکە. وشە دروستەکان دەقەکە دەردەخەن، هەڵەکان بۆ پێداچوونەوە هەڵدەگیرێن، و سورەتە تەواوبووەکان وەک لەبەرکراو نیشان دەدرێن.',
+  };
+
+  String memorizationStageLabel(MemorizationWorkflowStage stage) =>
+      switch (stage) {
+        MemorizationWorkflowStage.newLesson => switch (language) {
+          AppLanguage.english => 'New lesson',
+          AppLanguage.arabic => 'درس جديد',
+          AppLanguage.kurdish => 'دەرسێکی نوێ',
+        },
+        MemorizationWorkflowStage.continueLesson => switch (language) {
+          AppLanguage.english => 'Continue lesson',
+          AppLanguage.arabic => 'واصل الدرس',
+          AppLanguage.kurdish => 'بەردەوامبە لە دەرسەکە',
+        },
+        MemorizationWorkflowStage.needsPractice => switch (language) {
+          AppLanguage.english => 'Needs practice',
+          AppLanguage.arabic => 'يحتاج مراجعة',
+          AppLanguage.kurdish => 'پێویستی بە ڕاهێنان هەیە',
+        },
+        MemorizationWorkflowStage.memorized => switch (language) {
+          AppLanguage.english => 'Memorized',
+          AppLanguage.arabic => 'محفوظة',
+          AppLanguage.kurdish => 'لەبەرکراوە',
+        },
+      };
+
+  String memorizationStageSummary(
+    MemorizationWorkflowStage stage, {
+    required int revealedWords,
+    required int totalWords,
+    int? lastMistakeWordIndex,
+  }) => switch (stage) {
+    MemorizationWorkflowStage.newLesson => switch (language) {
+      AppLanguage.english => 'Start this surah from the beginning.',
+      AppLanguage.arabic => 'ابدأ هذه السورة من البداية.',
+      AppLanguage.kurdish => 'ئەم سورەتە لە سەرەتاوە دەست پێ بکە.',
+    },
+    MemorizationWorkflowStage.continueLesson => switch (language) {
+      AppLanguage.english =>
+        totalWords > 0
+            ? 'Resume from word $revealedWords of $totalWords.'
+            : 'Resume from your saved lesson progress.',
+      AppLanguage.arabic =>
+        totalWords > 0
+            ? 'تابع من الكلمة $revealedWords من أصل $totalWords.'
+            : 'تابع من موضع الدرس المحفوظ.',
+      AppLanguage.kurdish =>
+        totalWords > 0
+            ? 'لە وشەی $revealedWords لە کۆی $totalWords بەردەوام بە.'
+            : 'لە شوێنی پاشەکەوتکراوی دەرسەکە بەردەوام بە.',
+    },
+    MemorizationWorkflowStage.needsPractice => switch (language) {
+      AppLanguage.english =>
+        lastMistakeWordIndex == null
+            ? 'Review the last weak section before moving on.'
+            : 'Practice again from word ${lastMistakeWordIndex + 1}.',
+      AppLanguage.arabic =>
+        lastMistakeWordIndex == null
+            ? 'راجع آخر موضع ضعيف قبل المتابعة.'
+            : 'أعد التدريب من الكلمة ${lastMistakeWordIndex + 1}.',
+      AppLanguage.kurdish =>
+        lastMistakeWordIndex == null
+            ? 'پێش بەردەوامبوون، دوا بەشی لاواز دوبارە ڕاهێنان بکە.'
+            : 'دووبارە لە وشەی ${lastMistakeWordIndex + 1} ڕاهێنان بکە.',
+    },
+    MemorizationWorkflowStage.memorized => switch (language) {
+      AppLanguage.english =>
+        'This surah is marked memorized. Review it any time.',
+      AppLanguage.arabic => 'هذه السورة معلّمة كمحفوظة. راجعها في أي وقت.',
+      AppLanguage.kurdish =>
+        'ئەم سورەتە وەک لەبەرکراو نیشان دراوە. هەرکاتێک دەتوانیت بیپێداچوونەوە.',
+    },
   };
 
   String get openMemorizationMode => switch (language) {
@@ -347,9 +435,9 @@ class AppStrings {
 
   String memorizationProgressLabel(int revealed, int total) =>
       switch (language) {
-        AppLanguage.english => 'Words revealed: $revealed / $total',
-        AppLanguage.arabic => 'الكلمات الظاهرة: $revealed / $total',
-        AppLanguage.kurdish => 'وشە دەرکەوتوەکان: $revealed / $total',
+        AppLanguage.english => 'Progress: $revealed / $total words',
+        AppLanguage.arabic => 'التقدم: $revealed / $total كلمة',
+        AppLanguage.kurdish => 'پێشکەوتن: $revealed / $total وشە',
       };
 
   String get memorizationMistakeTitle => switch (language) {
@@ -383,15 +471,60 @@ class AppStrings {
   };
 
   String get memorizationCompletedTitle => switch (language) {
-    AppLanguage.english => 'Surah completed',
+    AppLanguage.english => 'Surah memorized',
     AppLanguage.arabic => 'تمت السورة',
     AppLanguage.kurdish => 'سورەتەکە  تەواوبوو',
   };
 
   String get memorizationCompletedBody => switch (language) {
-    AppLanguage.english => 'Excellent. You revealed every word in this surah.',
-    AppLanguage.arabic => 'أحسنت. لقد أظهرت جميع كلمات السورة.',
-    AppLanguage.kurdish => 'دەست خۆش. هەموو وشەکانی سورەتەکە درووست بوون .',
+    AppLanguage.english =>
+      'Excellent. This surah is now marked as memorized and ready for review.',
+    AppLanguage.arabic =>
+      'أحسنت. هذه السورة معلّمة الآن كمحفوظة وجاهزة للمراجعة.',
+    AppLanguage.kurdish =>
+      'دەست خۆش. ئەم سورەتە ئێستا وەک لەبەرکراو نیشان دراوە و ئامادەی پێداچوونەوەیە.',
+  };
+
+  String get memorizationSavedCheckpointTitle => switch (language) {
+    AppLanguage.english => 'Saved lesson',
+    AppLanguage.arabic => 'درس محفوظ',
+    AppLanguage.kurdish => 'دەرسێکی هەڵگیراو',
+  };
+
+  String memorizationSavedCheckpointBody(
+    int revealed,
+    int total,
+  ) => switch (language) {
+    AppLanguage.english =>
+      'Resume from word $revealed of $total, or restart this surah from the beginning.',
+    AppLanguage.arabic =>
+      'تابع من الكلمة $revealed من أصل $total، أو ابدأ هذه السورة من جديد.',
+    AppLanguage.kurdish =>
+      'لە وشەی $revealed لە $total بەردەوام بە، یان ئەم سورەتە لە سەرەتاوە دووبارە دەست پێ بکە.',
+  };
+
+  String get memorizationResumeLesson => switch (language) {
+    AppLanguage.english => 'Continue lesson',
+    AppLanguage.arabic => 'واصل الدرس',
+    AppLanguage.kurdish => 'بەردەوامبە لە دەرسەکە',
+  };
+
+  String get memorizationPracticeWeakPoint => switch (language) {
+    AppLanguage.english => 'Practice weak point',
+    AppLanguage.arabic => 'تدرّب على الموضع الضعيف',
+    AppLanguage.kurdish => 'ڕاهێنان لە خاڵی لاواز',
+  };
+
+  String get memorizationStartFromBeginning => switch (language) {
+    AppLanguage.english => 'Start from beginning',
+    AppLanguage.arabic => 'ابدأ من البداية',
+    AppLanguage.kurdish => 'لە سەرەتاوە دەست پێ بکە',
+  };
+
+  String get memorizationReviewFromBeginning => switch (language) {
+    AppLanguage.english => 'Review from beginning',
+    AppLanguage.arabic => 'راجع من البداية',
+    AppLanguage.kurdish => 'لە سەرەتاوە پێداچوونەوە بکە',
   };
 
   String get memorizationErrorTitle => switch (language) {

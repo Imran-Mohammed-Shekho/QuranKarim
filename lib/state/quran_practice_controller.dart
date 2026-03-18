@@ -169,6 +169,11 @@ class QuranPracticeController extends ChangeNotifier {
   MemorizationCheckpoint? checkpointForSurah(int surahNumber) =>
       _memorizationCheckpoints[surahNumber];
 
+  MemorizationWorkflowStage memorizationStageForSurah(int surahNumber) {
+    return checkpointForSurah(surahNumber)?.stage ??
+        MemorizationWorkflowStage.newLesson;
+  }
+
   int? initialAyahNumberForSurah(int surahNumber) {
     final lastRead = _lastReadProgress;
     if (lastRead == null || lastRead.surahNumber != surahNumber) {
@@ -335,7 +340,8 @@ class QuranPracticeController extends ChangeNotifier {
               _memorizationExpectedWords.length,
             );
       memorizationRevealedCount = revealedCount;
-      _memorizationResumeIndex = revealedCount;
+      memorizationCompleted = checkpoint?.isCompleted ?? false;
+      _memorizationResumeIndex = memorizationCompleted ? 0 : revealedCount;
     } catch (_) {
       memorizationError =
           'Could not load memorization data. Check storage and try again.';
@@ -520,6 +526,40 @@ class QuranPracticeController extends ChangeNotifier {
     await startMemorization();
   }
 
+  Future<void> practiceMemorizationWeakPoint() async {
+    await stopMemorizationListening();
+    final checkpoint = memorizationSurahNumber == null
+        ? null
+        : checkpointForSurah(memorizationSurahNumber!);
+    final mistakeIndex = checkpoint?.lastMistakeWordIndex;
+    final startIndex = (mistakeIndex ?? memorizationRevealedCount).clamp(
+      0,
+      _memorizationExpectedWords.isEmpty
+          ? 0
+          : _memorizationExpectedWords.length,
+    );
+    memorizationCompleted = false;
+    memorizationRevealedCount = startIndex;
+    _memorizationResumeIndex = startIndex;
+    memorizationRawText = '';
+    memorizationCorrectedText = '';
+    _clearMemorizationFeedback();
+    notifyListeners();
+    await startMemorization();
+  }
+
+  Future<void> reviewMemorizationFromBeginning() async {
+    await stopMemorizationListening();
+    memorizationCompleted = false;
+    memorizationRevealedCount = 0;
+    _memorizationResumeIndex = 0;
+    memorizationRawText = '';
+    memorizationCorrectedText = '';
+    _clearMemorizationFeedback();
+    notifyListeners();
+    await startMemorization();
+  }
+
   void _resetMemorizationProgress() {
     memorizationRevealedCount = 0;
     memorizationCompleted = false;
@@ -578,7 +618,12 @@ class QuranPracticeController extends ChangeNotifier {
       memorizationSpokenWord = firstIssue.spokenWord;
       _isMemorizationListening = false;
       unawaited(_speechRecognitionService.stopListening());
-      unawaited(_persistMemorizationCheckpoint());
+      unawaited(
+        _persistMemorizationCheckpoint(
+          needsReview: true,
+          lastMistakeWordIndex: absoluteMistake,
+        ),
+      );
       return;
     }
 
@@ -587,12 +632,24 @@ class QuranPracticeController extends ChangeNotifier {
       memorizationCompleted = true;
       _isMemorizationListening = false;
       unawaited(_speechRecognitionService.stopListening());
-      unawaited(_clearMemorizationCheckpointForCurrentSurah());
+      unawaited(
+        _persistMemorizationCheckpoint(
+          revealedWords: _memorizationExpectedWords.length,
+          totalWords: _memorizationExpectedWords.length,
+          needsReview: false,
+          clearLastMistake: true,
+        ),
+      );
       unawaited(_recordRecentSession(PracticeSessionType.memorization));
       return;
     }
 
-    unawaited(_persistMemorizationCheckpoint());
+    unawaited(
+      _persistMemorizationCheckpoint(
+        needsReview: false,
+        clearLastMistake: true,
+      ),
+    );
   }
 
   Future<void> playAyah(Ayah ayah) async {
@@ -1072,19 +1129,34 @@ class QuranPracticeController extends ChangeNotifier {
     unawaited(_progressService.saveLastRead(_lastReadProgress!));
   }
 
-  Future<void> _persistMemorizationCheckpoint() async {
+  Future<void> _persistMemorizationCheckpoint({
+    int? revealedWords,
+    int? totalWords,
+    bool? needsReview,
+    int? lastMistakeWordIndex,
+    bool clearLastMistake = false,
+  }) async {
     final surahNumber = memorizationSurahNumber;
     if (surahNumber == null) {
       return;
     }
-    if (memorizationRevealedCount <= 0) {
+    final nextRevealedWords = revealedWords ?? memorizationRevealedCount;
+    final nextTotalWords = totalWords ?? _memorizationExpectedWords.length;
+    if (nextRevealedWords <= 0 && nextTotalWords <= 0) {
       await _clearMemorizationCheckpointForCurrentSurah();
       return;
     }
 
+    final existing = _memorizationCheckpoints[surahNumber];
+
     final checkpoint = MemorizationCheckpoint(
       surahNumber: surahNumber,
-      revealedWords: memorizationRevealedCount,
+      revealedWords: nextRevealedWords,
+      totalWords: nextTotalWords,
+      needsReview: needsReview ?? existing?.needsReview ?? false,
+      lastMistakeWordIndex: clearLastMistake
+          ? null
+          : lastMistakeWordIndex ?? existing?.lastMistakeWordIndex,
       updatedAt: DateTime.now(),
     );
     _memorizationCheckpoints = {
