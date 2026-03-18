@@ -518,6 +518,18 @@ class AppStrings {
     AppLanguage.kurdish => 'کاتێک هەر بانگێک دەست پێدەکات ئاگادارم بکەرەوە .',
   };
 
+  String prayerNotificationTitle(String prayerName) => switch (language) {
+    AppLanguage.english => '$prayerName Prayer Time',
+    AppLanguage.arabic => 'موعد صلاة $prayerName',
+    AppLanguage.kurdish => 'کاتی نوێژی $prayerName',
+  };
+
+  String prayerNotificationBody(String prayerName) => switch (language) {
+    AppLanguage.english => 'It\'s time to pray $prayerName.',
+    AppLanguage.arabic => 'حان وقت صلاة $prayerName.',
+    AppLanguage.kurdish => 'کاتی نوێژی $prayerName هاتووە.',
+  };
+
   String get prayerSettingsTitle => switch (language) {
     AppLanguage.english => 'Prayer settings',
     AppLanguage.arabic => 'إعدادات الصلاة',

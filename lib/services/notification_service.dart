@@ -9,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../models/prayer_time_model.dart';
 import '../models/zikir_reminder_models.dart';
+import 'notification_localization.dart';
 
 class NotificationService {
   NotificationService() : _plugin = FlutterLocalNotificationsPlugin();
@@ -125,6 +126,7 @@ class NotificationService {
   }) async {
     await initialize();
     await cancelPrayerNotifications();
+    final language = await NotificationLocalization.loadCurrentLanguage();
 
     final now = DateTime.now();
     AndroidScheduleMode scheduleMode =
@@ -155,8 +157,8 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         id: _notificationBaseId + index,
-        title: '${prayerName.label} Prayer Time',
-        body: 'It\'s time to pray ${prayerName.label}',
+        title: NotificationLocalization.prayerTitle(prayerName, language),
+        body: NotificationLocalization.prayerBody(prayerName, language),
         scheduledDate: tz.TZDateTime.from(scheduledTime, tz.local),
         notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(

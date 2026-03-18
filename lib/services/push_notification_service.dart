@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 import 'notification_service.dart';
+import 'notification_localization.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -93,11 +94,20 @@ class PushNotificationService {
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     final notification = message.notification;
-    final title = notification?.title ?? message.data['title'] as String?;
-    final body = notification?.body ?? message.data['body'] as String?;
+    final language = await NotificationLocalization.loadCurrentLanguage();
+    final content = NotificationLocalization.resolvePushContent(
+      data: message.data,
+      language: language,
+      fallbackTitle: notification?.title,
+      fallbackBody: notification?.body,
+    );
+    final title = content.title;
+    final body = content.body;
 
     if (title == null || body == null) {
-      debugPrint('Foreground push received without title/body: ${message.data}');
+      debugPrint(
+        'Foreground push received without title/body: ${message.data}',
+      );
       return;
     }
 
