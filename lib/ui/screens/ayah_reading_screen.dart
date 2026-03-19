@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/models/ayah.dart';
 import '../../data/models/surah.dart';
 import '../../services/ayah_comparison_service.dart';
 import '../../state/app_settings_controller.dart';
@@ -28,17 +29,18 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
   bool _showingArabicSpeechDialog = false;
   final Map<int, GlobalKey> _ayahKeys = <int, GlobalKey>{};
   final ScrollController _scrollController = ScrollController();
-  int? _pendingInitialScrollAyahNumber;
-  bool _initialScrollCompleted = false;
-  int _initialScrollAttempts = 0;
+  final TextEditingController _searchController = TextEditingController();
+  int? _pendingScrollAyahNumber;
+  int _scrollAttempts = 0;
+  String _searchQuery = '';
 
-  static const int _maxInitialScrollAttempts = 20;
+  static const int _maxScrollAttempts = 20;
   static const double _ayahTopInset = 12;
 
   @override
   void initState() {
     super.initState();
-    _pendingInitialScrollAyahNumber = widget.initialAyahNumber;
+    _pendingScrollAyahNumber = widget.initialAyahNumber;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await context.read<QuranPracticeController>().loadAyahs(
         widget.surah.number,
@@ -70,6 +72,7 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
   }
 
   void _scheduleScrollToAyah(int ayahNumber) {
+    _pendingScrollAyahNumber = ayahNumber;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -83,7 +86,7 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
     QuranPracticeController controller,
     int ayahNumber,
   ) async {
-    if (!mounted || _initialScrollCompleted) {
+    if (!mounted || _pendingScrollAyahNumber != ayahNumber) {
       return;
     }
 
@@ -110,9 +113,8 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
           }
 
           if (!controller.isLoadingAyahs) {
-            _initialScrollCompleted = true;
-            _pendingInitialScrollAyahNumber = null;
-            _initialScrollAttempts = 0;
+            _pendingScrollAyahNumber = null;
+            _scrollAttempts = 0;
           } else {
             _scheduleScrollToAyah(ayahNumber);
           }
@@ -122,7 +124,7 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
     }
 
     if (!_scrollController.hasClients ||
-        _initialScrollAttempts >= _maxInitialScrollAttempts) {
+        _scrollAttempts >= _maxScrollAttempts) {
       return;
     }
 
@@ -133,16 +135,38 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
     if ((nextOffset - _scrollController.offset).abs() < 8) {
       return;
     }
-    _initialScrollAttempts++;
+    _scrollAttempts++;
     await _scrollController.animateTo(
       nextOffset,
       duration: const Duration(milliseconds: 260),
       curve: Curves.easeOutCubic,
     );
 
-    if (!_initialScrollCompleted) {
+    if (_pendingScrollAyahNumber == ayahNumber) {
       _scheduleScrollToAyah(ayahNumber);
     }
+  }
+
+  bool _matchesAyahQuery(String query, Ayah ayah) {
+    final normalizedQuery = query.trim().toLowerCase();
+    if (normalizedQuery.isEmpty) {
+      return true;
+    }
+
+    if ('${ayah.ayahNumber}'.contains(normalizedQuery)) {
+      return true;
+    }
+
+    if (ayah.arabicText.toLowerCase().contains(normalizedQuery)) {
+      return true;
+    }
+
+    final kurdishText = ayah.kurdishText?.toLowerCase();
+    if (kurdishText != null && kurdishText.contains(normalizedQuery)) {
+      return true;
+    }
+
+    return false;
   }
 
   GlobalKey _keyForAyah(int ayahNumber) {
@@ -212,7 +236,16 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
         builder: (context, controller, _) {
           _maybeShowArabicSpeechDialog(controller);
           final lastRead = controller.lastReadProgress;
-          final pendingScrollAyahNumber = _pendingInitialScrollAyahNumber;
+          final pendingScrollAyahNumber = _pendingScrollAyahNumber;
+          final normalizedSearchQuery = _searchQuery.trim();
+          final matchedAyahIndex = normalizedSearchQuery.isEmpty
+              ? 0
+              : controller.ayahs.indexWhere(
+                  (ayah) => _matchesAyahQuery(normalizedSearchQuery, ayah),
+                );
+          final visibleAyahs = matchedAyahIndex < 0
+              ? const <Ayah>[]
+              : controller.ayahs.sublist(matchedAyahIndex);
           if (pendingScrollAyahNumber != null &&
               controller.ayahs.any(
                 (ayah) => ayah.ayahNumber == pendingScrollAyahNumber,
@@ -432,48 +465,106 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: strings.searchAyahHint,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _searchQuery.trim().isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: strings.clearAyahSearchLabel,
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                ),
+              ),
               const SizedBox(height: 8),
-              for (final ayah in controller.ayahs)
-                KeyedSubtree(
-                  key: _keyForAyah(ayah.ayahNumber),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: AyahTile(
-                      ayah: ayah,
-                      isActive:
-                          controller.practicingAyahNumber == ayah.ayahNumber,
-                      isPlayingAudio: controller.isPlayingAudioForAyah(
-                        ayah.ayahNumber,
-                      ),
-                      highlightedWordIndex: controller
-                          .highlightedPlaybackWordIndexForAyah(ayah.ayahNumber),
-                      isStopMarker:
-                          lastRead?.surahNumber == ayah.surahNumber &&
-                          lastRead?.ayahNumber == ayah.ayahNumber,
-                      isListening: controller.isListening,
-                      isAutoReading: controller.isAutoReading,
-                      rawRecognizedText:
-                          controller.practicingAyahNumber == ayah.ayahNumber
-                          ? controller.rawRecognizedText
-                          : '',
-                      correctedRecognizedText:
-                          controller.practicingAyahNumber == ayah.ayahNumber
-                          ? controller.displayRecognizedText
-                          : '',
-                      result: controller.resultForAyah(ayah.ayahNumber),
-                      coachResult: controller.coachForAyah(ayah.ayahNumber),
-                      feedbackMessage: controller.feedbackForAyah(
-                        ayah.ayahNumber,
-                      ),
-                      onListenPressed: () => controller.playAyah(ayah),
-                      onStopMarkerPressed: () =>
-                          controller.markLastReadAyah(ayah),
-                      onReadPressed: () => controller.toggleReading(ayah),
-                      onAutoReadPressed: () =>
-                          controller.toggleAutoReading(ayah),
+              if (visibleAyahs.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 40,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          strings.noAyahMatches,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          strings.searchAyahTryAnother,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
+                )
+              else
+                for (final ayah in visibleAyahs)
+                  KeyedSubtree(
+                    key: _keyForAyah(ayah.ayahNumber),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: AyahTile(
+                        ayah: ayah,
+                        isActive:
+                            controller.practicingAyahNumber == ayah.ayahNumber,
+                        isPlayingAudio: controller.isPlayingAudioForAyah(
+                          ayah.ayahNumber,
+                        ),
+                        highlightedWordIndex: controller
+                            .highlightedPlaybackWordIndexForAyah(
+                              ayah.ayahNumber,
+                            ),
+                        isStopMarker:
+                            lastRead?.surahNumber == ayah.surahNumber &&
+                            lastRead?.ayahNumber == ayah.ayahNumber,
+                        isListening: controller.isListening,
+                        isAutoReading: controller.isAutoReading,
+                        rawRecognizedText:
+                            controller.practicingAyahNumber == ayah.ayahNumber
+                            ? controller.rawRecognizedText
+                            : '',
+                        correctedRecognizedText:
+                            controller.practicingAyahNumber == ayah.ayahNumber
+                            ? controller.displayRecognizedText
+                            : '',
+                        result: controller.resultForAyah(ayah.ayahNumber),
+                        coachResult: controller.coachForAyah(ayah.ayahNumber),
+                        feedbackMessage: controller.feedbackForAyah(
+                          ayah.ayahNumber,
+                        ),
+                        onListenPressed: () => controller.playAyah(ayah),
+                        onStopMarkerPressed: () =>
+                            controller.markLastReadAyah(ayah),
+                        onReadPressed: () => controller.toggleReading(ayah),
+                        onAutoReadPressed: () =>
+                            controller.toggleAutoReading(ayah),
+                      ),
+                    ),
+                  ),
             ],
           );
         },
@@ -483,6 +574,7 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }

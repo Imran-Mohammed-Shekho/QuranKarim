@@ -16,16 +16,19 @@ void main() {
       );
     });
 
-    test('falls back to english for missing or invalid values', () {
-      expect(
-        NotificationLocalization.languageFromPreference(null),
-        AppLanguage.english,
-      );
-      expect(
-        NotificationLocalization.languageFromPreference('unknown'),
-        AppLanguage.english,
-      );
-    });
+    test(
+      'falls back to app default language for missing or invalid values',
+      () {
+        expect(
+          NotificationLocalization.languageFromPreference(null),
+          AppLanguage.kurdish,
+        );
+        expect(
+          NotificationLocalization.languageFromPreference('unknown'),
+          AppLanguage.kurdish,
+        );
+      },
+    );
   });
 
   group('NotificationLocalization.resolvePushContent', () {

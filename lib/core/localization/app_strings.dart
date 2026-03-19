@@ -1308,6 +1308,31 @@ class AppStrings {
     AppLanguage.kurdish => 'ئایەتەکان',
   };
 
+  String get searchAyahHint => switch (language) {
+    AppLanguage.english => 'Search ayah number or text',
+    AppLanguage.arabic => 'ابحث برقم الآية أو النص',
+    AppLanguage.kurdish => 'بە ژمارەی ئایەت یان دەق بگەڕێ',
+  };
+
+  String get clearAyahSearchLabel => switch (language) {
+    AppLanguage.english => 'Clear search',
+    AppLanguage.arabic => 'مسح البحث',
+    AppLanguage.kurdish => 'پاککردنەوەی گەڕان',
+  };
+
+  String get noAyahMatches => switch (language) {
+    AppLanguage.english => 'No ayahs matched this search.',
+    AppLanguage.arabic => 'لا توجد آيات تطابق هذا البحث.',
+    AppLanguage.kurdish => 'هیچ ئایەتێک لەگەڵ ئەم گەڕانە ناگونجێت.',
+  };
+
+  String get searchAyahTryAnother => switch (language) {
+    AppLanguage.english => 'Try a different ayah number or search phrase.',
+    AppLanguage.arabic => 'جرّب رقم آية آخر أو عبارة بحث مختلفة.',
+    AppLanguage.kurdish =>
+      'ژمارەی ئایەتێکی تر یان دەقێکی تری گەڕان تاقی بکەرەوە.',
+  };
+
   String get ayahScreenSubtitle => switch (language) {
     AppLanguage.english =>
       'Use the speaker to hear the reference and the microphone to compare your recitation.',

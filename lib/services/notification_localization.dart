@@ -23,7 +23,7 @@ class NotificationLocalization {
   static AppLanguage languageFromPreference(String? rawLanguage) {
     return AppLanguage.values.firstWhere(
       (value) => value.name == rawLanguage,
-      orElse: () => AppLanguage.english,
+      orElse: () => AppLanguage.kurdish,
     );
   }
 
