@@ -581,35 +581,18 @@ class _WordRevealPanel extends StatelessWidget {
       if (isLastWordOfAyah) {
         final showAyahMarker = revealedCount >= i + 1;
         spans.add(
-          TextSpan(
-            text:
-                '  ${quranAyahMarker(word.ayahNumber, useArabicIndicDigits: useArabicDigits)} ',
-            style:
-                const TextStyle(
-                  fontSize: 28,
-                  height: 1.7,
-                  fontFamilyFallback: ['Times New Roman', 'serif'],
-                ).copyWith(
-                  color: showAyahMarker
-                      ? colorScheme.primary
-                      : Colors.transparent,
-                  fontWeight: FontWeight.w900,
-                ),
+          buildQuranAyahMarkerSpan(
+            ayahNumber: word.ayahNumber,
+            style: const TextStyle(
+              fontSize: 28,
+              height: 1.7,
+              fontFamilyFallback: ['Times New Roman', 'serif'],
+            ),
+            color: colorScheme.primary,
+            useArabicIndicDigits: useArabicDigits,
+            visible: showAyahMarker,
           ),
         );
-        if (showAyahMarker) {
-          spans.add(
-            TextSpan(
-              text: ' ',
-              style:
-                  const TextStyle(
-                    fontSize: 28,
-                    height: 1.7,
-                    fontFamilyFallback: ['Times New Roman', 'serif'],
-                  ).copyWith(color: colorScheme.onSurface),
-            ),
-          );
-        }
       }
     }
 

@@ -1,4 +1,4 @@
-package com.example.quran1
+package com.qurannoor.mobile
 
 import android.content.Context
 import android.hardware.Sensor
@@ -35,7 +35,7 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler, SensorEventL
         magnetometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, compassChannelName)
-                .setStreamHandler(this)
+            .setStreamHandler(this)
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
@@ -70,6 +70,7 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler, SensorEventL
                 hasGravity = true
                 emitFromFallbackSensors()
             }
+
             Sensor.TYPE_MAGNETIC_FIELD -> {
                 magneticValues = event.values.clone()
                 hasMagnetic = true
@@ -84,15 +85,15 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler, SensorEventL
         }
 
         val manager =
-                sensorManager
-                        ?: run {
-                            eventSink?.error(
-                                    "NO_SENSOR_MANAGER",
-                                    "Sensor manager is unavailable.",
-                                    null
-                            )
-                            return
-                        }
+            sensorManager
+                ?: run {
+                    eventSink?.error(
+                        "NO_SENSOR_MANAGER",
+                        "Sensor manager is unavailable.",
+                        null,
+                    )
+                    return
+                }
 
         if (rotationVectorSensor != null) {
             manager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI)
@@ -120,10 +121,11 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler, SensorEventL
         hasMagnetic = false
     }
 
-    private fun emitFromRotationVector(values: FloatArray) {
+    private fun emitFromRotationVector(rotationVector: FloatArray) {
         val rotationMatrix = FloatArray(9)
-        SensorManager.getRotationMatrixFromVector(rotationMatrix, values)
-        emitHeading(rotationMatrix)
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVector)
+        val adjustedMatrix = adjustForDisplayRotation(rotationMatrix)
+        emitHeadingFromMatrix(adjustedMatrix)
     }
 
     private fun emitFromFallbackSensors() {
@@ -132,72 +134,60 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler, SensorEventL
         }
 
         val rotationMatrix = FloatArray(9)
-        if (!SensorManager.getRotationMatrix(rotationMatrix, null, gravityValues, magneticValues)) {
+        val inclinationMatrix = FloatArray(9)
+        val success =
+            SensorManager.getRotationMatrix(
+                rotationMatrix,
+                inclinationMatrix,
+                gravityValues,
+                magneticValues,
+            )
+        if (!success) {
             return
         }
-        emitHeading(rotationMatrix)
+
+        val adjustedMatrix = adjustForDisplayRotation(rotationMatrix)
+        emitHeadingFromMatrix(adjustedMatrix)
     }
 
-    private fun emitHeading(rotationMatrix: FloatArray) {
-        val adjustedMatrix = FloatArray(9)
-        when (currentDisplayRotation()) {
-            Surface.ROTATION_90 ->
-                    SensorManager.remapCoordinateSystem(
-                            rotationMatrix,
-                            SensorManager.AXIS_Y,
-                            SensorManager.AXIS_MINUS_X,
-                            adjustedMatrix
-                    )
-            Surface.ROTATION_180 ->
-                    SensorManager.remapCoordinateSystem(
-                            rotationMatrix,
-                            SensorManager.AXIS_MINUS_X,
-                            SensorManager.AXIS_MINUS_Y,
-                            adjustedMatrix
-                    )
-            Surface.ROTATION_270 ->
-                    SensorManager.remapCoordinateSystem(
-                            rotationMatrix,
-                            SensorManager.AXIS_MINUS_Y,
-                            SensorManager.AXIS_X,
-                            adjustedMatrix
-                    )
-            else -> System.arraycopy(rotationMatrix, 0, adjustedMatrix, 0, rotationMatrix.size)
+    private fun adjustForDisplayRotation(rotationMatrix: FloatArray): FloatArray {
+        val remappedMatrix = FloatArray(9)
+        val rotation =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                display?.rotation ?: Surface.ROTATION_0
+            } else {
+                @Suppress("DEPRECATION")
+                windowManager.defaultDisplay.rotation
+            }
+
+        val (worldAxisX, worldAxisY) =
+            when (rotation) {
+                Surface.ROTATION_90 -> SensorManager.AXIS_Y to SensorManager.AXIS_MINUS_X
+                Surface.ROTATION_180 ->
+                    SensorManager.AXIS_MINUS_X to SensorManager.AXIS_MINUS_Y
+
+                Surface.ROTATION_270 -> SensorManager.AXIS_MINUS_Y to SensorManager.AXIS_X
+                else -> SensorManager.AXIS_X to SensorManager.AXIS_Y
+            }
+
+        SensorManager.remapCoordinateSystem(
+            rotationMatrix,
+            worldAxisX,
+            worldAxisY,
+            remappedMatrix,
+        )
+        return remappedMatrix
+    }
+
+    private fun emitHeadingFromMatrix(rotationMatrix: FloatArray) {
+        val orientationValues = FloatArray(3)
+        SensorManager.getOrientation(rotationMatrix, orientationValues)
+        val azimuthRadians = orientationValues[0]
+        val azimuthDegrees =
+            ((Math.toDegrees(azimuthRadians.toDouble()) + 360.0) % 360.0).toFloat()
+        if (lastHeading.isNaN() || abs(lastHeading - azimuthDegrees) >= 1f) {
+            lastHeading = azimuthDegrees
+            eventSink?.success(azimuthDegrees.toDouble())
         }
-
-        val orientation = FloatArray(3)
-        SensorManager.getOrientation(adjustedMatrix, orientation)
-        val azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
-        val normalizedHeading = normalizeHeading(azimuth)
-        val smoothedHeading = smoothHeading(normalizedHeading)
-
-        if (lastHeading.isNaN() || abs(angleDelta(lastHeading, smoothedHeading)) >= 0.5f) {
-            lastHeading = smoothedHeading
-            eventSink?.success(smoothedHeading.toDouble())
-        }
-    }
-
-    private fun currentDisplayRotation(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            display?.rotation ?: Surface.ROTATION_0
-        } else {
-            @Suppress("DEPRECATION") windowManager.defaultDisplay.rotation
-        }
-    }
-
-    private fun smoothHeading(rawHeading: Float): Float {
-        if (lastHeading.isNaN()) {
-            return rawHeading
-        }
-        val delta = angleDelta(lastHeading, rawHeading)
-        return normalizeHeading(lastHeading + (delta * 0.18f))
-    }
-
-    private fun angleDelta(from: Float, to: Float): Float {
-        return (((to - from) + 540f) % 360f) - 180f
-    }
-
-    private fun normalizeHeading(value: Float): Float {
-        return ((value % 360f) + 360f) % 360f
     }
 }

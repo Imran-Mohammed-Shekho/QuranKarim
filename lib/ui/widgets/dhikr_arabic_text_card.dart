@@ -44,12 +44,15 @@ class DhikrArabicTextCard extends StatelessWidget {
                       TextSpan(
                         children: [
                           TextSpan(text: verses[index].text),
-                          TextSpan(
-                            text: '  ${quranAyahMarker(verses[index].ayahNumber)}',
-                            style: textStyle?.copyWith(
-                              color: colorScheme.primary,
-                              fontWeight: FontWeight.w900,
-                            ),
+                          buildQuranAyahMarkerSpan(
+                            ayahNumber: verses[index].ayahNumber,
+                            style:
+                                textStyle ??
+                                const TextStyle(
+                                  fontSize: 24,
+                                  height: 1.85,
+                                ),
+                            color: colorScheme.primary,
                           ),
                         ],
                       ),

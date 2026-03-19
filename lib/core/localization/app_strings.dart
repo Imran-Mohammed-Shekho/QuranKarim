@@ -1042,7 +1042,7 @@ class AppStrings {
     AppLanguage.english =>
       'Current fallback reciter streams until you download it.',
     AppLanguage.arabic => 'القارئ الحالي يعمل بالبث إلى أن تقوم بتنزيله.',
-    AppLanguage.kurdish => 'ئەم قارییەی ئێستا ستریم دەکرێت تا دایدەگریت.',
+    AppLanguage.kurdish => 'ئەم قارییەی ئێستا داونڵۆد دەکرێت تا دایدەگریت.',
   };
 
   String get reciterNeedsDownloadLabel => switch (language) {
@@ -1080,8 +1080,7 @@ class AppStrings {
     AppLanguage.english =>
       '$reciterName audio is saved locally for this surah.',
     AppLanguage.arabic => 'تم حفظ صوت $reciterName محلياً لهذه السورة.',
-    AppLanguage.kurdish =>
-      'دەنگی $reciterName بۆ ئەم سوورەتە لۆکاڵی هەڵگیراوە.',
+    AppLanguage.kurdish => 'دەنگی $reciterName بۆ ئەم سوورەتە  دابەزێندراوە.',
   };
 
   String get languageSectionSubtitle => switch (language) {
@@ -1783,7 +1782,7 @@ class AppStrings {
   String get readingReciterTitle => switch (language) {
     AppLanguage.english => 'Reciter for this reading session',
     AppLanguage.arabic => 'القارئ لجلسة القراءة هذه',
-    AppLanguage.kurdish => 'قاریی بۆ ئەم دانیشتنی خوێندنەوەیە',
+    AppLanguage.kurdish => 'دەنگی قاریی دڵخوازت هەڵبژێرە',
   };
 
   String get readingReciterSubtitle => switch (language) {
@@ -1793,6 +1792,140 @@ class AppStrings {
       'بدّل القارئ من هنا أثناء الاستماع، وسيتم تحديث الاختيار الافتراضي في التطبيق أيضاً.',
     AppLanguage.kurdish =>
       'لەێرەوە قارییەکە بگۆڕە لەکاتی گوێگرتندا، هەمان هەڵبژاردن دەبێتە بنەڕەت بۆ ئەپەکەش.',
+  };
+
+  String get readingOptionsTitle => switch (language) {
+    AppLanguage.english => 'Reading options',
+    AppLanguage.arabic => 'خيارات القراءة',
+    AppLanguage.kurdish => 'هەڵبژاردەکانی خوێندنەوە',
+  };
+
+  String get arabicFontSizeLabel => switch (language) {
+    AppLanguage.english => 'Arabic font size',
+    AppLanguage.arabic => 'حجم خط العربية',
+    AppLanguage.kurdish => 'قەبارەی فۆنتی عەرەبی',
+  };
+
+  String get showTranslationLabel => switch (language) {
+    AppLanguage.english => 'Show translation',
+    AppLanguage.arabic => 'إظهار الترجمة',
+    AppLanguage.kurdish => 'پیشاندانی وەرگێڕان',
+  };
+
+  String get translationVisibleLabel => switch (language) {
+    AppLanguage.english => 'Translation is visible under each ayah.',
+    AppLanguage.arabic => 'الترجمة ظاهرة تحت كل آية.',
+    AppLanguage.kurdish => 'وەرگێڕانەکە لە ژێر هەر ئایەتێک پیشان دەدرێت.',
+  };
+
+  String get translationHiddenLabel => switch (language) {
+    AppLanguage.english => 'Only the Arabic ayah text is shown.',
+    AppLanguage.arabic => 'يتم عرض نص الآية بالعربية فقط.',
+    AppLanguage.kurdish => 'تەنها دەقی عەرەبی ئایەتەکە پیشان دەدرێت.',
+  };
+
+  String get bookmarkAyahLabel => switch (language) {
+    AppLanguage.english => 'Bookmark ayah',
+    AppLanguage.arabic => 'احفظ الآية في العلامات',
+    AppLanguage.kurdish => 'ئایەتەکە بکە بە نیشانە',
+  };
+
+  String get removeAyahBookmarkLabel => switch (language) {
+    AppLanguage.english => 'Remove ayah bookmark',
+    AppLanguage.arabic => 'إزالة علامة الآية',
+    AppLanguage.kurdish => 'لابردنی نیشانەی ئایەت',
+  };
+
+  String get addAyahNoteLabel => switch (language) {
+    AppLanguage.english => 'Add note',
+    AppLanguage.arabic => 'أضف ملاحظة',
+    AppLanguage.kurdish => 'تێبینی زیاد بکە',
+  };
+
+  String get editAyahNoteLabel => switch (language) {
+    AppLanguage.english => 'Edit note',
+    AppLanguage.arabic => 'عدّل الملاحظة',
+    AppLanguage.kurdish => 'دەستکاری تێبینی بکە',
+  };
+
+  String get studyNoteTitle => switch (language) {
+    AppLanguage.english => 'Study note',
+    AppLanguage.arabic => 'ملاحظة الدراسة',
+    AppLanguage.kurdish => 'تێبینی خوێندنەوە',
+  };
+
+  String get ayahNoteHint => switch (language) {
+    AppLanguage.english => 'Write what you want to remember about this ayah.',
+    AppLanguage.arabic => 'اكتب ما تريد تذكره عن هذه الآية.',
+    AppLanguage.kurdish =>
+      'ئەوە بنووسە کە دەتەوێت دەربارەی ئەم ئایەتە لەبیرت بمێنێت.',
+  };
+
+  String get saveAyahNoteLabel => switch (language) {
+    AppLanguage.english => 'Save note',
+    AppLanguage.arabic => 'حفظ الملاحظة',
+    AppLanguage.kurdish => 'پاشەکەوتکردنی تێبینی',
+  };
+
+  String get clearAyahNoteLabel => switch (language) {
+    AppLanguage.english => 'Clear note',
+    AppLanguage.arabic => 'حذف الملاحظة',
+    AppLanguage.kurdish => 'سڕینەوەی تێبینی',
+  };
+
+  String get bookmarkedAyahChipLabel => switch (language) {
+    AppLanguage.english => 'Bookmarked',
+    AppLanguage.arabic => 'محفوظة',
+    AppLanguage.kurdish => 'نیشانە کراوە',
+  };
+
+  String get studyNoteChipLabel => switch (language) {
+    AppLanguage.english => 'Has note',
+    AppLanguage.arabic => 'بها ملاحظة',
+    AppLanguage.kurdish => 'تێبینی هەیە',
+  };
+
+  String get ayahActionsLegendTitle => switch (language) {
+    AppLanguage.english => 'Ayah actions',
+    AppLanguage.arabic => 'إجراءات الآية',
+    AppLanguage.kurdish => 'کردارەکانی ئایەت',
+  };
+
+  String get ayahLastReadLegendLabel => switch (language) {
+    AppLanguage.english => 'Flag = last read position',
+    AppLanguage.arabic => 'الراية = آخر موضع قراءة',
+    AppLanguage.kurdish => 'ئاڵا = دوا شوێنی خوێندنەوە',
+  };
+
+  String get ayahLastReadLegendDescription => switch (language) {
+    AppLanguage.english => 'Marks the place where you stopped reading.',
+    AppLanguage.arabic => 'يحدد الموضع الذي توقفت عنده في القراءة.',
+    AppLanguage.kurdish => 'ئەو شوێنە دیاری دەکات کە لێی خوێندنەوەت وەستا.',
+  };
+
+  String get ayahBookmarkLegendLabel => switch (language) {
+    AppLanguage.english => 'Bookmark = saved ayah',
+    AppLanguage.arabic => 'العلامة = آية محفوظة',
+    AppLanguage.kurdish => 'نیشانە = ئایەتی پاشەکەوتکراو',
+  };
+
+  String get ayahBookmarkLegendDescription => switch (language) {
+    AppLanguage.english => 'Saves this ayah so you can revisit it later.',
+    AppLanguage.arabic => 'تحفظ هذه الآية لتعود إليها لاحقاً.',
+    AppLanguage.kurdish =>
+      'ئەم ئایەتە پاشەکەوت دەکات بۆ ئەوەی دواتر بگەڕێیتەوە بۆی.',
+  };
+
+  String get ayahNoteLegendLabel => switch (language) {
+    AppLanguage.english => 'Note = study note',
+    AppLanguage.arabic => 'الملاحظة = ملاحظة للدراسة',
+    AppLanguage.kurdish => 'تێبینی = تێبینی خوێندنەوە',
+  };
+
+  String get ayahNoteLegendDescription => switch (language) {
+    AppLanguage.english => 'Lets you write your own note about the ayah.',
+    AppLanguage.arabic => 'يتيح لك كتابة ملاحظتك الخاصة حول الآية.',
+    AppLanguage.kurdish => 'ڕێگات پێدەدات تێبینی خۆت لەسەر ئایەتەکە بنووسیت.',
   };
 
   String get downloadCurrentSurahAudioLabel => switch (language) {
@@ -2019,6 +2152,28 @@ class AppStrings {
     AppLanguage.arabic => 'أحدث جلسات التلاوة والحفظ الخاصة بك.',
     AppLanguage.kurdish => 'دوایین دانیشتنەکانی تلاوەت و حەفظی تۆ.',
   };
+
+  String get savedAyahsTitle => switch (language) {
+    AppLanguage.english => 'Saved ayahs and notes',
+    AppLanguage.arabic => 'الآيات والملاحظات المحفوظة',
+    AppLanguage.kurdish => 'ئایەت و تێبینی پاشەکەوتکراوەکان',
+  };
+
+  String get savedAyahsSubtitle => switch (language) {
+    AppLanguage.english =>
+      'Return quickly to the ayahs you bookmarked or annotated for study.',
+    AppLanguage.arabic =>
+      'ارجع سريعاً إلى الآيات التي حفظتها أو دوّنت عليها ملاحظات.',
+    AppLanguage.kurdish =>
+      'بە خێرایی بگەڕێوە بۆ ئەو ئایەتانەی نیشانەت کردووە یان تێبینی بۆ نووسیویت.',
+  };
+
+  String bookmarkedAyahSummary(String surahLabel, int ayahNumber) =>
+      switch (language) {
+        AppLanguage.english => '$surahLabel • Ayah $ayahNumber',
+        AppLanguage.arabic => '$surahLabel • الآية $ayahNumber',
+        AppLanguage.kurdish => '$surahLabel • ئایەت $ayahNumber',
+      };
 
   String surahFallbackLabel(int surahNumber) => switch (language) {
     AppLanguage.english => 'Surah $surahNumber',

@@ -93,6 +93,13 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           final lastReadSurah = lastRead == null
               ? null
               : quranController.surahByNumber(lastRead.surahNumber);
+          final savedAyahEntries = quranController.studyEntries
+              .where(
+                (entry) =>
+                    quranController.surahByNumber(entry.surahNumber) != null,
+              )
+              .take(3)
+              .toList(growable: false);
           MemorizationCheckpoint? latestCheckpoint;
           Surah? latestCheckpointSurah;
           for (final surah in quranController.surahs) {
@@ -398,6 +405,49 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
                           ),
                         ),
                     ],
+                    if (savedAyahEntries.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      _SectionTitle(
+                        title: strings.savedAyahsTitle,
+                        subtitle: strings.savedAyahsSubtitle,
+                      ),
+                      const SizedBox(height: 14),
+                      for (final entry in savedAyahEntries)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _ActionCard(
+                            title: strings.bookmarkedAyahSummary(
+                              quranController
+                                      .surahByNumber(entry.surahNumber)
+                                      ?.nameEnglish ??
+                                  strings.surahFallbackLabel(
+                                    entry.surahNumber,
+                                  ),
+                              entry.ayahNumber,
+                            ),
+                            body: entry.hasNote
+                                ? _studyNotePreview(entry.note!)
+                                : strings.bookmarkedAyahChipLabel,
+                            icon: entry.hasNote
+                                ? Icons.sticky_note_2_rounded
+                                : Icons.bookmark_rounded,
+                            onPressed: () {
+                              final surah = quranController.surahByNumber(
+                                entry.surahNumber,
+                              );
+                              if (surah == null) {
+                                widget.onNavigate(1);
+                                return;
+                              }
+                              _openAyahSession(
+                                surah,
+                                ayahNumber: entry.ayahNumber,
+                              );
+                            },
+                            buttonLabel: strings.openAyahLabel,
+                          ),
+                        ),
+                    ],
                   ]),
                 ),
               ),
@@ -407,6 +457,14 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
       ),
     );
   }
+}
+
+String _studyNotePreview(String note) {
+  final normalized = note.replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (normalized.length <= 96) {
+    return normalized;
+  }
+  return '${normalized.substring(0, 93)}...';
 }
 
 class _SectionTitle extends StatelessWidget {

@@ -87,6 +87,7 @@ class QuranPracticeController extends ChangeNotifier {
   LastReadProgress? _lastReadProgress;
   Map<int, MemorizationCheckpoint> _memorizationCheckpoints = {};
   List<PracticeSessionRecord> _recentSessions = const [];
+  final Map<String, AyahStudyEntry> _ayahStudyEntries = <String, AyahStudyEntry>{};
   Map<String, int> _weakWordCounts = {};
 
   bool get isListening => _speechRecognitionService.isListening;
@@ -135,6 +136,11 @@ class QuranPracticeController extends ChangeNotifier {
   LastReadProgress? get lastReadProgress => _lastReadProgress;
   List<PracticeSessionRecord> get recentSessions =>
       List.unmodifiable(_recentSessions);
+  List<AyahStudyEntry> get studyEntries {
+    final entries = _ayahStudyEntries.values.toList(growable: false)
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return List.unmodifiable(entries);
+  }
   List<Surah> get favoriteSurahs => surahs
       .where((surah) => _favoriteSurahNumbers.contains(surah.number))
       .toList(growable: false);
@@ -165,6 +171,15 @@ class QuranPracticeController extends ChangeNotifier {
 
   bool isFavoriteSurah(int surahNumber) =>
       _favoriteSurahNumbers.contains(surahNumber);
+
+  AyahStudyEntry? studyEntryForAyah(int surahNumber, int ayahNumber) =>
+      _ayahStudyEntries[_studyEntryKey(surahNumber, ayahNumber)];
+
+  bool isAyahBookmarked(int surahNumber, int ayahNumber) =>
+      studyEntryForAyah(surahNumber, ayahNumber)?.isBookmarked ?? false;
+
+  String? noteForAyah(int surahNumber, int ayahNumber) =>
+      studyEntryForAyah(surahNumber, ayahNumber)?.note;
 
   MemorizationCheckpoint? checkpointForSurah(int surahNumber) =>
       _memorizationCheckpoints[surahNumber];
@@ -205,6 +220,11 @@ class QuranPracticeController extends ChangeNotifier {
     _lastReadProgress = snapshot.lastRead;
     _memorizationCheckpoints = snapshot.memorizationCheckpoints;
     _recentSessions = snapshot.recentSessions;
+    _ayahStudyEntries
+      ..clear()
+      ..addEntries(
+        snapshot.studyEntries.map((entry) => MapEntry(entry.key, entry)),
+      );
     _weakWordCounts = snapshot.weakWordCounts;
     await loadSurahs();
   }
@@ -1114,6 +1134,73 @@ class QuranPracticeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> toggleAyahBookmark(Ayah ayah) async {
+    final key = _studyEntryKey(ayah.surahNumber, ayah.ayahNumber);
+    final existing = _ayahStudyEntries[key];
+    final now = DateTime.now();
+    if (existing == null) {
+      _ayahStudyEntries[key] = AyahStudyEntry(
+        surahNumber: ayah.surahNumber,
+        ayahNumber: ayah.ayahNumber,
+        isBookmarked: true,
+        updatedAt: now,
+      );
+    } else if (existing.isBookmarked) {
+      if (existing.hasNote) {
+        _ayahStudyEntries[key] = existing.copyWith(
+          isBookmarked: false,
+          updatedAt: now,
+        );
+      } else {
+        _ayahStudyEntries.remove(key);
+      }
+    } else {
+      _ayahStudyEntries[key] = existing.copyWith(
+        isBookmarked: true,
+        updatedAt: now,
+      );
+    }
+    notifyListeners();
+    await _persistStudyEntries();
+  }
+
+  Future<void> saveAyahNote(Ayah ayah, String note) async {
+    final trimmed = note.trim();
+    final key = _studyEntryKey(ayah.surahNumber, ayah.ayahNumber);
+    final existing = _ayahStudyEntries[key];
+    final now = DateTime.now();
+
+    if (trimmed.isEmpty) {
+      if (existing == null) {
+        return;
+      }
+      if (existing.isBookmarked) {
+        _ayahStudyEntries[key] = existing.copyWith(
+          clearNote: true,
+          updatedAt: now,
+        );
+      } else {
+        _ayahStudyEntries.remove(key);
+      }
+    } else if (existing == null) {
+      _ayahStudyEntries[key] = AyahStudyEntry(
+        surahNumber: ayah.surahNumber,
+        ayahNumber: ayah.ayahNumber,
+        isBookmarked: false,
+        note: trimmed,
+        updatedAt: now,
+      );
+    } else {
+      _ayahStudyEntries[key] = existing.copyWith(
+        note: trimmed,
+        updatedAt: now,
+      );
+    }
+
+    notifyListeners();
+    await _persistStudyEntries();
+  }
+
   bool isPlayingAudioForAyah(int ayahNumber) =>
       _playingAyahNumber == ayahNumber && _isAudioPlaying;
 
@@ -1128,6 +1215,13 @@ class QuranPracticeController extends ChangeNotifier {
     );
     unawaited(_progressService.saveLastRead(_lastReadProgress!));
   }
+
+  Future<void> _persistStudyEntries() async {
+    await _progressService.saveAyahStudyEntries(_ayahStudyEntries.values);
+  }
+
+  String _studyEntryKey(int surahNumber, int ayahNumber) =>
+      '$surahNumber:$ayahNumber';
 
   Future<void> _persistMemorizationCheckpoint({
     int? revealedWords,

@@ -212,6 +212,28 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
     });
   }
 
+  Future<void> _showAyahNoteSheet(Ayah ayah) async {
+    final controller = context.read<QuranPracticeController>();
+    final strings = context.read<AppSettingsController>().strings;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (_) => _AyahNoteSheet(
+        ayah: ayah,
+        title: strings.studyNoteTitle,
+        ayahLabel: strings.ayahNumberLabel(ayah.ayahNumber),
+        hintText: strings.ayahNoteHint,
+        clearLabel: strings.clearAyahNoteLabel,
+        saveLabel: strings.saveAyahNoteLabel,
+        initialNote:
+            controller.noteForAyah(ayah.surahNumber, ayah.ayahNumber) ?? '',
+        onSave: (note) => controller.saveAyahNote(ayah, note),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -229,6 +251,8 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
       selectedReciter.id,
       widget.surah.number,
     );
+    final arabicFontSize = appSettings.quranArabicFontSize;
+    final showTranslation = appSettings.showQuranTranslation;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.surah.nameEnglish)),
@@ -299,14 +323,6 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      strings.readingReciterSubtitle,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        height: 1.4,
-                      ),
-                    ),
                     const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
                       key: ValueKey<String>(appSettings.selectedReciterId),
@@ -362,7 +378,7 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                             ? strings.surahAudioReadyLabel(
                                 selectedReciter.displayName,
                               )
-                            : strings.reciterStreamingLabel,
+                            : "",
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -451,21 +467,98 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                   ],
                 ),
               ),
+              SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.65),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.readingOptionsTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            strings.arabicFontSizeLabel,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            arabicFontSize.toStringAsFixed(0),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: arabicFontSize,
+                      min: 24,
+                      max: 40,
+                      divisions: 8,
+                      label: arabicFontSize.toStringAsFixed(0),
+                      onChanged: (value) {
+                        appSettings.setQuranArabicFontSize(value);
+                      },
+                    ),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: showTranslation,
+                      onChanged: (value) {
+                        appSettings.setShowQuranTranslation(value);
+                      },
+                      title: Text(
+                        strings.showTranslationLabel,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        showTranslation
+                            ? strings.translationVisibleLabel
+                            : strings.translationHiddenLabel,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
+
               Text(
                 strings.ayahsTitle,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                strings.ayahScreenSubtitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 14),
+
+              const SizedBox(height: 10),
               TextField(
                 controller: _searchController,
                 onChanged: (value) {
@@ -488,6 +581,50 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                           },
                           icon: const Icon(Icons.close_rounded),
                         ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.ayahActionsLegendTitle,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _AyahActionLegendChip(
+                          icon: Icons.outlined_flag_rounded,
+                          title: strings.ayahLastReadLegendLabel,
+                          description: strings.ayahLastReadLegendDescription,
+                        ),
+                        _AyahActionLegendChip(
+                          icon: Icons.bookmark_outline_rounded,
+                          title: strings.ayahBookmarkLegendLabel,
+                          description: strings.ayahBookmarkLegendDescription,
+                        ),
+                        _AyahActionLegendChip(
+                          icon: Icons.edit_note_rounded,
+                          title: strings.ayahNoteLegendLabel,
+                          description: strings.ayahNoteLegendDescription,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 8),
@@ -529,6 +666,16 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                       padding: const EdgeInsets.only(top: 12),
                       child: AyahTile(
                         ayah: ayah,
+                        arabicFontSize: arabicFontSize,
+                        showTranslation: showTranslation,
+                        isStudyBookmarked: controller.isAyahBookmarked(
+                          ayah.surahNumber,
+                          ayah.ayahNumber,
+                        ),
+                        noteText: controller.noteForAyah(
+                          ayah.surahNumber,
+                          ayah.ayahNumber,
+                        ),
                         isActive:
                             controller.practicingAyahNumber == ayah.ayahNumber,
                         isPlayingAudio: controller.isPlayingAudioForAyah(
@@ -557,6 +704,9 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
                           ayah.ayahNumber,
                         ),
                         onListenPressed: () => controller.playAyah(ayah),
+                        onStudyBookmarkPressed: () =>
+                            controller.toggleAyahBookmark(ayah),
+                        onNotePressed: () => _showAyahNoteSheet(ayah),
                         onStopMarkerPressed: () =>
                             controller.markLastReadAyah(ayah),
                         onReadPressed: () => controller.toggleReading(ayah),
@@ -577,5 +727,178 @@ class _AyahReadingScreenState extends State<AyahReadingScreen> {
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class _AyahActionLegendChip extends StatelessWidget {
+  const _AyahActionLegendChip({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 220, maxWidth: 320),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 16, color: colorScheme.primary),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AyahNoteSheet extends StatefulWidget {
+  const _AyahNoteSheet({
+    required this.ayah,
+    required this.title,
+    required this.ayahLabel,
+    required this.hintText,
+    required this.clearLabel,
+    required this.saveLabel,
+    required this.initialNote,
+    required this.onSave,
+  });
+
+  final Ayah ayah;
+  final String title;
+  final String ayahLabel;
+  final String hintText;
+  final String clearLabel;
+  final String saveLabel;
+  final String initialNote;
+  final Future<void> Function(String note) onSave;
+
+  @override
+  State<_AyahNoteSheet> createState() => _AyahNoteSheetState();
+}
+
+class _AyahNoteSheetState extends State<_AyahNoteSheet> {
+  late final TextEditingController _controller;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialNote);
+  }
+
+  Future<void> _save(String note) async {
+    if (_saving) {
+      return;
+    }
+    setState(() {
+      _saving = true;
+    });
+    await widget.onSave(note);
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, bottomInset + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              widget.ayahLabel,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              minLines: 4,
+              maxLines: 8,
+              decoration: InputDecoration(hintText: widget.hintText),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _saving ? null : () => _save(''),
+                    child: Text(widget.clearLabel),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _saving ? null : () => _save(_controller.text),
+                    child: Text(widget.saveLabel),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

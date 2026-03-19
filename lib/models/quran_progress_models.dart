@@ -140,11 +140,69 @@ class PracticeSessionRecord {
   }
 }
 
+class AyahStudyEntry {
+  const AyahStudyEntry({
+    required this.surahNumber,
+    required this.ayahNumber,
+    required this.isBookmarked,
+    required this.updatedAt,
+    this.note,
+  });
+
+  final int surahNumber;
+  final int ayahNumber;
+  final bool isBookmarked;
+  final String? note;
+  final DateTime updatedAt;
+
+  bool get hasNote => note != null && note!.trim().isNotEmpty;
+
+  String get key => '$surahNumber:$ayahNumber';
+
+  AyahStudyEntry copyWith({
+    bool? isBookmarked,
+    String? note,
+    bool clearNote = false,
+    DateTime? updatedAt,
+  }) {
+    return AyahStudyEntry(
+      surahNumber: surahNumber,
+      ayahNumber: ayahNumber,
+      isBookmarked: isBookmarked ?? this.isBookmarked,
+      note: clearNote ? null : (note ?? this.note),
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'surahNumber': surahNumber,
+      'ayahNumber': ayahNumber,
+      'isBookmarked': isBookmarked,
+      'note': note,
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory AyahStudyEntry.fromJson(Map<String, dynamic> json) {
+    return AyahStudyEntry(
+      surahNumber: (json['surahNumber'] as num?)?.toInt() ?? 0,
+      ayahNumber: (json['ayahNumber'] as num?)?.toInt() ?? 0,
+      isBookmarked: json['isBookmarked'] as bool? ?? false,
+      note: (json['note'] as String?)?.trim(),
+      updatedAt:
+          DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+}
+
 class QuranProgressSnapshot {
   const QuranProgressSnapshot({
     required this.favoriteSurahNumbers,
     required this.memorizationCheckpoints,
     required this.recentSessions,
+    required this.studyEntries,
     required this.weakWordCounts,
     this.lastRead,
   });
@@ -153,5 +211,6 @@ class QuranProgressSnapshot {
   final LastReadProgress? lastRead;
   final Map<int, MemorizationCheckpoint> memorizationCheckpoints;
   final List<PracticeSessionRecord> recentSessions;
+  final List<AyahStudyEntry> studyEntries;
   final Map<String, int> weakWordCounts;
 }

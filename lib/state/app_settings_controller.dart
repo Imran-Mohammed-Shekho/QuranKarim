@@ -11,6 +11,8 @@ class AppSettingsController extends ChangeNotifier {
   static const _themeModeKey = 'app_theme_mode';
   static const _selectedReciterKey = 'selected_reciter';
   static const _onboardingCompletedKey = 'onboarding_completed';
+  static const _quranArabicFontSizeKey = 'quran_arabic_font_size';
+  static const _showQuranTranslationKey = 'show_quran_translation';
 
   AppSettingsController({
     required ReciterDownloadService reciterDownloadService,
@@ -30,6 +32,8 @@ class AppSettingsController extends ChangeNotifier {
   String? _reciterDownloadError;
   bool _hasCompletedOnboarding = false;
   bool _isBootstrapped = false;
+  double _quranArabicFontSize = 31;
+  bool _showQuranTranslation = true;
 
   AppStrings get strings => AppStrings(language);
 
@@ -46,6 +50,8 @@ class AppSettingsController extends ChangeNotifier {
   String? get reciterDownloadError => _reciterDownloadError;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   bool get isBootstrapped => _isBootstrapped;
+  double get quranArabicFontSize => _quranArabicFontSize;
+  bool get showQuranTranslation => _showQuranTranslation;
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
@@ -53,6 +59,11 @@ class AppSettingsController extends ChangeNotifier {
     final savedThemeMode = prefs.getString(_themeModeKey);
     final savedReciter = prefs.getString(_selectedReciterKey)?.trim();
     _hasCompletedOnboarding = prefs.getBool(_onboardingCompletedKey) ?? false;
+    _quranArabicFontSize =
+        (prefs.getDouble(_quranArabicFontSizeKey) ?? _quranArabicFontSize)
+            .clamp(24.0, 40.0);
+    _showQuranTranslation =
+        prefs.getBool(_showQuranTranslationKey) ?? _showQuranTranslation;
     if (savedLanguage != null) {
       language = AppLanguage.values.firstWhere(
         (value) => value.name == savedLanguage,
@@ -115,6 +126,27 @@ class AppSettingsController extends ChangeNotifier {
     _hasCompletedOnboarding = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_onboardingCompletedKey, true);
+    notifyListeners();
+  }
+
+  Future<void> setQuranArabicFontSize(double value) async {
+    final normalized = value.clamp(24.0, 40.0);
+    if ((_quranArabicFontSize - normalized).abs() < 0.01) {
+      return;
+    }
+    _quranArabicFontSize = normalized;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_quranArabicFontSizeKey, normalized);
+    notifyListeners();
+  }
+
+  Future<void> setShowQuranTranslation(bool value) async {
+    if (_showQuranTranslation == value) {
+      return;
+    }
+    _showQuranTranslation = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_showQuranTranslationKey, value);
     notifyListeners();
   }
 

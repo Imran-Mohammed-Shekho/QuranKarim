@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:595622131269:android:98a0901960f4b5ccead52c",
+        "mobilesdk_app_id": "1:595622131269:android:22e9af9d4ed46333ead52c",
         "android_client_info": {
-          "package_name": "com.example.quran1"
+          "package_name": "com.qurannoor.mobile"
         }
       },
       "oauth_client": [],

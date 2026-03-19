@@ -14,6 +14,7 @@ class QuranProgressService {
   static const _lastReadKey = 'quran_last_read';
   static const _memorizationCheckpointsKey = 'quran_memorization_checkpoints';
   static const _recentSessionsKey = 'quran_recent_sessions';
+  static const _ayahStudyEntriesKey = 'quran_ayah_study_entries';
   static const _weakWordCountsKey = 'quran_weak_word_counts';
   static const _maxRecentSessions = 10;
 
@@ -33,6 +34,9 @@ class QuranProgressService {
     final recentSessions = _decodeRecentSessions(
       prefs.getString(_recentSessionsKey),
     );
+    final studyEntries = _decodeStudyEntries(
+      prefs.getString(_ayahStudyEntriesKey),
+    );
     final weakWordCounts = _decodeWeakWordCounts(
       prefs.getString(_weakWordCountsKey),
     );
@@ -42,6 +46,7 @@ class QuranProgressService {
       lastRead: lastRead,
       memorizationCheckpoints: memorizationCheckpoints,
       recentSessions: recentSessions,
+      studyEntries: studyEntries,
       weakWordCounts: weakWordCounts,
     );
   }
@@ -121,6 +126,16 @@ class QuranProgressService {
       jsonEncode(
         sessions.map((value) => value.toJson()).toList(growable: false),
       ),
+    );
+  }
+
+  Future<void> saveAyahStudyEntries(Iterable<AyahStudyEntry> entries) async {
+    final prefs = await _preferencesProvider();
+    final values = entries.toList(growable: false)
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    await prefs.setString(
+      _ayahStudyEntriesKey,
+      jsonEncode(values.map((value) => value.toJson()).toList(growable: false)),
     );
   }
 
@@ -205,6 +220,34 @@ class QuranProgressService {
           .map(PracticeSessionRecord.fromJson)
           .where((session) => session.surahNumber > 0)
           .toList(growable: true);
+    } on FormatException {
+      return [];
+    }
+  }
+
+  List<AyahStudyEntry> _decodeStudyEntries(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return [];
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) {
+        return [];
+      }
+
+      final entries = decoded
+          .whereType<Map<String, dynamic>>()
+          .map(AyahStudyEntry.fromJson)
+          .where(
+            (entry) =>
+                entry.surahNumber > 0 &&
+                entry.ayahNumber > 0 &&
+                (entry.isBookmarked || entry.hasNote),
+          )
+          .toList(growable: true)
+        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return entries;
     } on FormatException {
       return [];
     }

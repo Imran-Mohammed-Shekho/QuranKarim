@@ -87,6 +87,35 @@ void main() {
     );
   });
 
+  test('ayah bookmarks and notes persist in snapshot', () async {
+    final service = QuranProgressService();
+
+    await service.saveAyahStudyEntries([
+      AyahStudyEntry(
+        surahNumber: 2,
+        ayahNumber: 255,
+        isBookmarked: true,
+        note: 'Review this after Fajr.',
+        updatedAt: DateTime(2026, 3, 16, 20, 0),
+      ),
+      AyahStudyEntry(
+        surahNumber: 67,
+        ayahNumber: 1,
+        isBookmarked: false,
+        note: 'Memorize the opening.',
+        updatedAt: DateTime(2026, 3, 16, 20, 5),
+      ),
+    ]);
+
+    final snapshot = await service.loadSnapshot();
+
+    expect(snapshot.studyEntries, hasLength(2));
+    expect(snapshot.studyEntries.first.surahNumber, 67);
+    expect(snapshot.studyEntries.first.note, 'Memorize the opening.');
+    expect(snapshot.studyEntries.last.isBookmarked, isTrue);
+    expect(snapshot.studyEntries.last.ayahNumber, 255);
+  });
+
   test('weak word counts are incremented and restored', () async {
     final service = QuranProgressService();
 

@@ -1,11 +1,22 @@
-String quranAyahMarker(
-  int ayahNumber, {
+import 'package:flutter/material.dart';
+
+InlineSpan buildQuranAyahMarkerSpan({
+  required int ayahNumber,
+  required TextStyle style,
+  required Color color,
   bool useArabicIndicDigits = true,
+  bool visible = true,
 }) {
-  final number = useArabicIndicDigits
+  final displayNumber = useArabicIndicDigits
       ? formatArabicIndicNumber(ayahNumber)
       : ayahNumber.toString();
-  return '\uFD3F$number\uFD3E';
+  return TextSpan(
+    text: '  ﴿$displayNumber﴾',
+    style: style.copyWith(
+      color: visible ? color : Colors.transparent,
+      fontWeight: FontWeight.w900,
+    ),
+  );
 }
 
 String formatArabicIndicNumber(int value) {

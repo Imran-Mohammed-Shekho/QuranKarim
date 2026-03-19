@@ -12,6 +12,10 @@ class AyahTile extends StatelessWidget {
   const AyahTile({
     super.key,
     required this.ayah,
+    required this.arabicFontSize,
+    required this.showTranslation,
+    required this.isStudyBookmarked,
+    required this.noteText,
     required this.isActive,
     required this.isPlayingAudio,
     required this.highlightedWordIndex,
@@ -24,12 +28,18 @@ class AyahTile extends StatelessWidget {
     required this.coachResult,
     required this.feedbackMessage,
     required this.onListenPressed,
+    required this.onStudyBookmarkPressed,
+    required this.onNotePressed,
     required this.onReadPressed,
     required this.onAutoReadPressed,
     required this.onStopMarkerPressed,
   });
 
   final Ayah ayah;
+  final double arabicFontSize;
+  final bool showTranslation;
+  final bool isStudyBookmarked;
+  final String? noteText;
   final bool isActive;
   final bool isPlayingAudio;
   final int? highlightedWordIndex;
@@ -42,6 +52,8 @@ class AyahTile extends StatelessWidget {
   final LocalCoachResult? coachResult;
   final String? feedbackMessage;
   final VoidCallback onListenPressed;
+  final VoidCallback onStudyBookmarkPressed;
+  final VoidCallback onNotePressed;
   final VoidCallback onReadPressed;
   final VoidCallback onAutoReadPressed;
   final VoidCallback onStopMarkerPressed;
@@ -75,25 +87,41 @@ class AyahTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               _ActionIconButton(
                 tooltip: strings.listen,
                 onPressed: onListenPressed,
                 icon: Icons.volume_up_rounded,
               ),
-              const SizedBox(width: 8),
               _ActionIconButton(
                 tooltip: isStopMarker
                     ? strings.savedStopPointTooltip
                     : strings.markStopPointTooltip,
                 onPressed: onStopMarkerPressed,
-                icon: isStopMarker
-                    ? Icons.bookmark_rounded
-                    : Icons.bookmark_border_rounded,
+                icon: isStopMarker ? Icons.flag_rounded : Icons.outlined_flag_rounded,
               ),
-              const SizedBox(width: 8),
+              _ActionIconButton(
+                tooltip: isStudyBookmarked
+                    ? strings.removeAyahBookmarkLabel
+                    : strings.bookmarkAyahLabel,
+                onPressed: onStudyBookmarkPressed,
+                icon: isStudyBookmarked
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_outline_rounded,
+              ),
+              _ActionIconButton(
+                tooltip: (noteText?.trim().isNotEmpty ?? false)
+                    ? strings.editAyahNoteLabel
+                    : strings.addAyahNoteLabel,
+                onPressed: onNotePressed,
+                icon: (noteText?.trim().isNotEmpty ?? false)
+                    ? Icons.sticky_note_2_rounded
+                    : Icons.edit_note_rounded,
+              ),
               _ActionIconButton(
                 tooltip: isListening && isActive ? strings.stop : strings.read,
                 onPressed: onReadPressed,
@@ -128,8 +156,8 @@ class AyahTile extends StatelessWidget {
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
             text: TextSpan(
-              style: const TextStyle(
-                fontSize: 31,
+              style: TextStyle(
+                fontSize: arabicFontSize,
                 height: 1.82,
                 fontFamilyFallback: ['Times New Roman', 'serif'],
               ).copyWith(color: colorScheme.onSurface),
@@ -149,7 +177,8 @@ class AyahTile extends StatelessWidget {
               ),
             ),
           ],
-          if (ayah.kurdishText != null &&
+          if (showTranslation &&
+              ayah.kurdishText != null &&
               ayah.kurdishText!.trim().isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
@@ -164,6 +193,29 @@ class AyahTile extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
+          ],
+          if (isStudyBookmarked || (noteText?.trim().isNotEmpty ?? false)) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (isStudyBookmarked)
+                  _InlineStatusChip(
+                    label: strings.bookmarkedAyahChipLabel,
+                    icon: Icons.bookmark_rounded,
+                  ),
+                if (noteText?.trim().isNotEmpty ?? false)
+                  _InlineStatusChip(
+                    label: strings.studyNoteChipLabel,
+                    icon: Icons.sticky_note_2_rounded,
+                  ),
+              ],
+            ),
+          ],
+          if (noteText?.trim().isNotEmpty ?? false) ...[
+            const SizedBox(height: 12),
+            _StudyNoteCard(noteText: noteText!),
           ],
           if (isStopMarker) ...[
             const SizedBox(height: 12),
@@ -266,18 +318,18 @@ class AyahTile extends StatelessWidget {
     );
   }
 
-  List<TextSpan> _buildArabicWordSpans(ColorScheme colorScheme) {
+  List<InlineSpan> _buildArabicWordSpans(ColorScheme colorScheme) {
     final words = ayah.arabicText
         .trim()
         .split(RegExp(r'\s+'))
         .where((word) => word.isNotEmpty)
         .toList(growable: false);
     if (words.isEmpty) {
-      return [
+      return <InlineSpan>[
         TextSpan(
           text: ayah.arabicText,
-          style: const TextStyle(
-            fontSize: 31,
+          style: TextStyle(
+            fontSize: arabicFontSize,
             height: 1.82,
             fontFamilyFallback: ['Times New Roman', 'serif'],
           ),
@@ -285,7 +337,7 @@ class AyahTile extends StatelessWidget {
       ];
     }
 
-    final spans = <TextSpan>[];
+    final spans = <InlineSpan>[];
     for (var index = 0; index < words.length; index++) {
       final word = words[index];
       final isCurrentWord = isPlayingAudio && highlightedWordIndex == index;
@@ -297,8 +349,8 @@ class AyahTile extends StatelessWidget {
         TextSpan(
           text: index == words.length - 1 ? word : '$word ',
           style:
-              const TextStyle(
-                fontSize: 31,
+              TextStyle(
+                fontSize: arabicFontSize,
                 height: 1.82,
                 fontFamilyFallback: ['Times New Roman', 'serif'],
               ).copyWith(
@@ -316,16 +368,14 @@ class AyahTile extends StatelessWidget {
       );
     }
     spans.add(
-      TextSpan(
-        text: '  ${quranAyahMarker(ayah.ayahNumber)}',
-        style: const TextStyle(
-          fontSize: 31,
+      buildQuranAyahMarkerSpan(
+        ayahNumber: ayah.ayahNumber,
+        style: TextStyle(
+          fontSize: arabicFontSize,
           height: 1.82,
           fontFamilyFallback: ['Times New Roman', 'serif'],
-        ).copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w900,
         ),
+        color: colorScheme.primary,
       ),
     );
     return spans;
@@ -498,6 +548,80 @@ class _ActionIconButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _InlineStatusChip extends StatelessWidget {
+  const _InlineStatusChip({required this.label, required this.icon});
+
+  final String label;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.primary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyNoteCard extends StatelessWidget {
+  const _StudyNoteCard({required this.noteText});
+
+  final String noteText;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.read<AppSettingsController>().strings.studyNoteTitle,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SelectableText(
+            noteText,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              height: 1.5,
+              color: colorScheme.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }
