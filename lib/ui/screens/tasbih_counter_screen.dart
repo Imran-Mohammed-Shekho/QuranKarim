@@ -4,12 +4,13 @@ import 'package:provider/provider.dart';
 import '../../models/dhikr_models.dart';
 import '../../state/app_settings_controller.dart';
 import '../../state/zikir_controller.dart';
+import '../widgets/dhikr_arabic_text_card.dart';
 
 String _localizedDhikrLabel(
   AppSettingsController settings,
   DhikrDefinition dhikr,
 ) {
-  return dhikr.arabicText;
+  return dhikr.labelFor(settings.language);
 }
 
 class TasbihCounterScreen extends StatefulWidget {
@@ -206,16 +207,7 @@ class _TasbihCounterScreenState extends State<TasbihCounterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        dhikr.arabicText,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (localizedLabel != dhikr.arabicText)
+                      if (localizedLabel != dhikr.arabicText) ...[
                         Text(
                           localizedLabel,
                           textAlign: TextAlign.center,
@@ -224,6 +216,16 @@ class _TasbihCounterScreenState extends State<TasbihCounterScreen> {
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        const SizedBox(height: 12),
+                      ],
+                      DhikrArabicTextCard(
+                        dhikr: dhikr,
+                        padding: const EdgeInsets.all(18),
+                        textStyle: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          height: 1.85,
+                        ),
+                      ),
                       if (localizedMeaning != null) ...[
                         const SizedBox(height: 8),
                         Text(

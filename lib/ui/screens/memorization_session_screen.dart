@@ -7,6 +7,7 @@ import '../../data/models/surah.dart';
 import '../../models/quran_progress_models.dart';
 import '../../state/app_settings_controller.dart';
 import '../../state/quran_practice_controller.dart';
+import '../widgets/quran_ayah_number_mark.dart';
 
 class MemorizationSessionScreen extends StatefulWidget {
   const MemorizationSessionScreen({super.key, required this.surah});
@@ -578,39 +579,37 @@ class _WordRevealPanel extends StatelessWidget {
       );
 
       if (isLastWordOfAyah) {
-        final showBadge = revealedCount >= i + 1;
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: AnimatedOpacity(
-              opacity: showBadge ? 1 : 0,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: _AyahNumberBadge(
-                  number: word.ayahNumber,
-                  useArabicDigits: useArabicDigits,
-                ),
-              ),
-            ),
-          ),
-        );
+        final showAyahMarker = revealedCount >= i + 1;
         spans.add(
           TextSpan(
-            text: ' ',
+            text:
+                '  ${quranAyahMarker(word.ayahNumber, useArabicIndicDigits: useArabicDigits)} ',
             style:
                 const TextStyle(
                   fontSize: 28,
                   height: 1.7,
                   fontFamilyFallback: ['Times New Roman', 'serif'],
                 ).copyWith(
-                  color: isRevealed
-                      ? colorScheme.onSurface
+                  color: showAyahMarker
+                      ? colorScheme.primary
                       : Colors.transparent,
+                  fontWeight: FontWeight.w900,
                 ),
           ),
         );
+        if (showAyahMarker) {
+          spans.add(
+            TextSpan(
+              text: ' ',
+              style:
+                  const TextStyle(
+                    fontSize: 28,
+                    height: 1.7,
+                    fontFamilyFallback: ['Times New Roman', 'serif'],
+                  ).copyWith(color: colorScheme.onSurface),
+            ),
+          );
+        }
       }
     }
 
@@ -632,57 +631,5 @@ class _WordRevealPanel extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _AyahNumberBadge extends StatelessWidget {
-  const _AyahNumberBadge({required this.number, required this.useArabicDigits});
-
-  final int number;
-  final bool useArabicDigits;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final displayNumber = useArabicDigits
-        ? _toArabicDigits(number)
-        : number.toString();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: colorScheme.surface,
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.35),
-          width: 1.2,
-        ),
-      ),
-      child: Text(
-        displayNumber,
-        textDirection: TextDirection.rtl,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          height: 1.2,
-          fontFamilyFallback: ['Times New Roman', 'serif'],
-        ),
-      ),
-    );
-  }
-
-  String _toArabicDigits(int value) {
-    const digits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    final buffer = StringBuffer();
-    for (final codeUnit in value.toString().codeUnits) {
-      final digit = codeUnit - 48;
-      if (digit >= 0 && digit <= 9) {
-        buffer.write(digits[digit]);
-      } else {
-        buffer.write(String.fromCharCode(codeUnit));
-      }
-    }
-    return buffer.toString();
   }
 }

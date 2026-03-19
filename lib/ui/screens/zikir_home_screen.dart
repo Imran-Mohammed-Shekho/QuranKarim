@@ -14,7 +14,7 @@ String _localizedDhikrLabel(
   AppSettingsController settings,
   DhikrDefinition dhikr,
 ) {
-  return dhikr.arabicText;
+  return dhikr.labelFor(settings.language);
 }
 
 class ZikirHomeScreen extends StatefulWidget {

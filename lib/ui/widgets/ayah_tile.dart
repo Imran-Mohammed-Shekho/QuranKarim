@@ -6,6 +6,7 @@ import '../../services/ayah_comparison_service.dart';
 import '../../services/local_tajweed_coach_service.dart';
 import '../../state/app_settings_controller.dart';
 import 'feedback_words_view.dart';
+import 'quran_ayah_number_mark.dart';
 
 class AyahTile extends StatelessWidget {
   const AyahTile({
@@ -75,41 +76,8 @@ class AyahTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? colorScheme.primary
-                      : isPlayingAudio
-                      ? colorScheme.tertiary
-                      : colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    '${ayah.ayahNumber}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: isActive
-                          ? colorScheme.onPrimary
-                          : isPlayingAudio
-                          ? colorScheme.onTertiary
-                          : colorScheme.onSurface,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  strings.ayahNumberLabel(ayah.ayahNumber),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
               _ActionIconButton(
                 tooltip: strings.listen,
                 onPressed: onListenPressed,
@@ -347,6 +315,19 @@ class AyahTile extends StatelessWidget {
         ),
       );
     }
+    spans.add(
+      TextSpan(
+        text: '  ${quranAyahMarker(ayah.ayahNumber)}',
+        style: const TextStyle(
+          fontSize: 31,
+          height: 1.82,
+          fontFamilyFallback: ['Times New Roman', 'serif'],
+        ).copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
     return spans;
   }
 

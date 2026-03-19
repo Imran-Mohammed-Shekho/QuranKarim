@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/dhikr_models.dart';
 import '../../state/app_settings_controller.dart';
 import '../../state/zikir_controller.dart';
+import '../widgets/dhikr_arabic_text_card.dart';
 import 'tasbih_counter_screen.dart';
 
 class ZikirCollectionScreen extends StatelessWidget {
@@ -110,7 +111,8 @@ class _CollectionStepCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final settings = context.read<AppSettingsController>();
     final strings = settings.strings;
-    final localizedLabel = dhikr?.arabicText ?? step.dhikrId;
+    final localizedLabel =
+        dhikr?.labelFor(settings.language) ?? dhikr?.arabicText ?? step.dhikrId;
     final localizedMeaning =
         dhikr?.meaningFor(settings.language) ??
         strings.localizedDhikrMeaning(
@@ -162,16 +164,23 @@ class _CollectionStepCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (dhikr != null) ...[
-            Text(
-              dhikr!.arabicText,
-              textDirection: TextDirection.rtl,
-              style: theme.textTheme.titleLarge?.copyWith(
+            if (localizedLabel != dhikr!.arabicText)
+              Text(
+                localizedLabel,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            if (localizedLabel != dhikr!.arabicText) const SizedBox(height: 12),
+            DhikrArabicTextCard(
+              dhikr: dhikr!,
+              textStyle: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
+                height: 1.85,
               ),
             ),
-            if (localizedLabel != dhikr!.arabicText) const SizedBox(height: 6),
           ],
-          if (dhikr == null || localizedLabel != dhikr!.arabicText)
+          if (dhikr == null)
             Text(
               localizedLabel,
               style: theme.textTheme.titleMedium?.copyWith(

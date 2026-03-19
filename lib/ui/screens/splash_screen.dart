@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                           Container(
                             width: 96,
                             height: 96,
-                            padding: const EdgeInsets.all(16),
+
                             decoration: BoxDecoration(
                               color: colorScheme.surface.withValues(
                                 alpha: 0.78,
@@ -152,7 +152,15 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ],
                             ),
-                            child: Image.asset('assets/app_logo.png'),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                'assets/app-logo.png',
+                                fit: BoxFit.contain,
+                                alignment: Alignment.center,
+                                filterQuality: FilterQuality.high,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 28),
                           Text(
