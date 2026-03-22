@@ -45,15 +45,15 @@ Future<void> main() async {
   );
   await pushNotificationService.initialize();
   runApp(
-    QuranNoorApp(
+    QiblaQuranApp(
       notificationService: notificationService,
       pushNotificationService: pushNotificationService,
     ),
   );
 }
 
-class QuranNoorApp extends StatelessWidget {
-  const QuranNoorApp({
+class QiblaQuranApp extends StatelessWidget {
+  const QiblaQuranApp({
     super.key,
     required this.notificationService,
     required this.pushNotificationService,

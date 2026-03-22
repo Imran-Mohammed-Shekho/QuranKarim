@@ -1,4 +1,4 @@
-# Quran Recitation Training App (Flutter)
+# Qibla Quran (Flutter)
 
 A Flutter mobile app for Quran recitation practice:
 - Browse all Surahs

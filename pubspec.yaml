@@ -1,5 +1,5 @@
 name: quran
-description: "Quran Noor with prayer times, zikr, recitation, qibla, and memorization tools."
+description: "Qibla Quran with prayer times, zikr, recitation, qibla, and memorization tools."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

@@ -1,11 +1,11 @@
 {
-    "name": "quran",
-    "short_name": "quran",
+    "name": "Qibla Quran",
+    "short_name": "Qibla Quran",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Qibla Quran with prayer times, zikr, recitation, qibla, and memorization tools.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

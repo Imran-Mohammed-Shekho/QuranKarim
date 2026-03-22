@@ -11,9 +11,9 @@ class AppStrings {
   bool get isRtl => language != AppLanguage.english;
 
   String get appName => switch (language) {
-    AppLanguage.english => 'Quran Noor',
-    AppLanguage.arabic => 'Quran Noor',
-    AppLanguage.kurdish => 'Quran Noor',
+    AppLanguage.english => 'Qibla Quran',
+    AppLanguage.arabic => 'Qibla Quran',
+    AppLanguage.kurdish => 'Qibla Quran',
   };
 
   String get navHome => switch (language) {
@@ -1127,11 +1127,11 @@ class AppStrings {
 
   String get aboutSectionBody => switch (language) {
     AppLanguage.english =>
-      'Quran Noor helps with recitation practice and displays exact Bang prayer times for supported Kurdistan cities with offline cache after download.',
+      'Qibla Quran helps with recitation practice and displays exact Bang prayer times for supported Kurdistan cities with offline cache after download.',
     AppLanguage.arabic =>
-      'يساعدك Quran Noor على التدريب على التلاوة ويعرض أوقات بانغ الدقيقة للمدن المدعومة في كردستان مع حفظها للعمل دون إنترنت بعد التحميل.',
+      'يساعدك Qibla Quran على التدريب على التلاوة ويعرض أوقات بانغ الدقيقة للمدن المدعومة في كردستان مع حفظها للعمل دون إنترنت بعد التحميل.',
     AppLanguage.kurdish =>
-      'Quran Noor یارمەتیت دەدات لە فێربوون و خوێندنەوەی قورئانی پیرۆز، و کاتەکانی بانگ بۆ شارە پشتیوانیکراوەکانی کوردستان لەبەردەست دەخات. ',
+      'Qibla Quran یارمەتیت دەدات لە فێربوون و خوێندنەوەی قورئانی پیرۆز، و کاتەکانی بانگ بۆ شارە پشتیوانیکراوەکانی کوردستان لەبەردەست دەخات. ',
   };
 
   String get locationAccessRequired => switch (language) {
